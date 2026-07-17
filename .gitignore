@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+.turbo/
+
+# environment — API 키는 절대 커밋하지 않는다
+.env
+.env.local
+.env.production
+.env.*.local
+
+# test
+coverage/
+
+# editor / OS
+.DS_Store
+Thumbs.db

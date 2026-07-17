@@ -1,0 +1,83 @@
+import { z } from "zod";
+import { CountryCode } from "./country.js";
+
+/** WGS84 좌표. GeoJSON Point와 상호 변환 가능 (spec: place-schema §location). */
+export const LatLng = z.object({
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+});
+export type LatLng = z.infer<typeof LatLng>;
+
+export const Address = z.object({
+  /** 공급자가 제공한 표시용 전체 주소 */
+  formatted: z.string().optional(),
+  /** ISO 3166-1 alpha-2 (예: "KR", "VN") */
+  country: CountryCode.optional(),
+  region: z.string().optional(),
+  city: z.string().optional(),
+  district: z.string().optional(),
+  street: z.string().optional(),
+  postalCode: z.string().optional(),
+});
+export type Address = z.infer<typeof Address>;
+
+export const Contact = z.object({
+  phone: z.string().optional(),
+  website: z.url().optional(),
+});
+export type Contact = z.infer<typeof Contact>;
+
+export const Business = z.object({
+  /** OSM opening_hours 포맷 (예: "Mo-Su 00:00-24:00") */
+  openingHours: z.string().optional(),
+  /** 0(무료)~4(최고가) */
+  priceLevel: z.number().int().min(0).max(4).optional(),
+  /** 0.0~5.0 정규화. 공급자별 스케일은 어댑터가 변환 */
+  rating: z.number().min(0).max(5).optional(),
+  reviewCount: z.number().int().nonnegative().optional(),
+});
+export type Business = z.infer<typeof Business>;
+
+/**
+ * 장소 정보의 출처. 항상 배열로 유지 — 다중 공급자 병합의 기반.
+ * `fields`는 이 소스가 기여한 필드 경로 목록 (병합 추적: "영업시간은 google, 좌표는 osm").
+ */
+export const PlaceSource = z.object({
+  provider: z.string().min(1),
+  providerPlaceId: z.string().min(1),
+  fetchedAt: z.iso.datetime(),
+  confidence: z.number().min(0).max(1).optional(),
+  fields: z.array(z.string()).optional(),
+});
+export type PlaceSource = z.infer<typeof PlaceSource>;
+
+/** GeoWire 내부 Place ID 접두사 */
+export const PLACE_ID_PREFIX = "gwp_";
+
+/**
+ * GeoWire 통합 Place 스키마 (spec: place-schema/v1).
+ * 모든 공급자 응답은 이 형태로 정규화된다.
+ */
+export const Place = z.object({
+  /** 안정적 내부 ID. 병합 후에도 유지된다 */
+  id: z.string().regex(/^gwp_[A-Za-z0-9_-]+$/, "id must start with 'gwp_'"),
+  name: z.string().min(1),
+  /** BCP 47 언어 태그 → 현지어 이름 (예: { ko: "본가", vi: "..." }) */
+  localizedNames: z.record(z.string(), z.string()).optional(),
+  /** GeoWire 표준 카테고리 (OSM 태그 체계 기반 평탄화) */
+  categories: z.array(z.string()),
+  location: LatLng,
+  address: Address.optional(),
+  contact: Contact.optional(),
+  business: Business.optional(),
+  /** 검색 기준점으로부터의 거리 (near가 주어진 경우) */
+  distanceMeters: z.number().nonnegative().optional(),
+  /** 병합·검증 후 종합 신뢰도 */
+  confidence: z.number().min(0).max(1).optional(),
+  /** 최소 1개 — 출처 없는 장소는 존재하지 않는다 */
+  sources: z.array(PlaceSource).min(1),
+  /** 표시 의무 문자열. Policy Engine이 주입 (예: "© OpenStreetMap contributors") */
+  attributions: z.array(z.string()),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+});
+export type Place = z.infer<typeof Place>;
