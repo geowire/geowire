@@ -50,6 +50,28 @@ importers:
         specifier: ^3.2.0
         version: 3.2.7(@types/node@22.20.1)
 
+  packages/providers/nominatim:
+    dependencies:
+      '@geowire/provider-sdk':
+        specifier: workspace:*
+        version: link:../../provider-sdk
+      '@geowire/schema':
+        specifier: workspace:*
+        version: link:../../schema
+    devDependencies:
+      '@geowire/provider-testkit':
+        specifier: workspace:*
+        version: link:../../provider-testkit
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.1
+      typescript:
+        specifier: ^5.8.0
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.0
+        version: 3.2.7(@types/node@22.20.1)
+
   packages/schema:
     dependencies:
       zod:

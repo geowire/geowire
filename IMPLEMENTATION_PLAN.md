@@ -6,12 +6,13 @@
 
 ---
 
-## 0. 현재 상태 (Phase 0·1·2 완료 ✅)
+## 0. 현재 상태 (Phase 0·1·2·3 완료 ✅)
 
 - [x] 모노레포 스캐폴딩 (pnpm + Turborepo + TS strict/ESM)
 - [x] `@geowire/schema` — Place / PlaceSource / ProviderManifest / 요청·응답 / CountryCode 스키마 (Zod v4, 테스트 23개 통과)
 - [x] `@geowire/provider-sdk` — GeoProvider / ProviderContext(재시도·타임아웃 fetch) / GeoProviderError / defineProvider (테스트 21개 통과)
 - [x] `@geowire/provider-testkit` — runConformanceChecks/Tests(6축) + mock-server + 픽스처 로더/레코더 (테스트 7개 통과)
+- [x] `@geowire/provider-nominatim` — search/geocode/reverse, 카테고리 맵, 1req/s rate limit·UA 강제, baseUrl 교체 (테스트 11개 통과)
 - [x] git 초기화 + baseline 커밋, Apache-2.0, README 스켈레톤
 - [ ] **(사용자 작업)** GitHub org `geowire` 생성, npm `@geowire` 스코프 확보, geowire.dev 구매
 
