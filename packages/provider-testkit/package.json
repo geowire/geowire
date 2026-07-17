@@ -1,0 +1,33 @@
+{
+  "name": "@geowire/provider-testkit",
+  "version": "0.1.0",
+  "description": "GeoWire provider conformance kit — \"testkit 통과 = 머지 가능\"",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@geowire/schema": "workspace:*",
+    "@geowire/provider-sdk": "workspace:*"
+  },
+  "peerDependencies": {
+    "vitest": "^3.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}
