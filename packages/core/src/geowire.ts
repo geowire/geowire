@@ -97,6 +97,7 @@ export class GeoWire {
       request: req,
       country: resolveCountry(req.country, req.near),
       near: req.near,
+      radiusMeters: req.radiusMeters,
       limit: req.limit,
       options: req.options,
     };

@@ -96,3 +96,51 @@ describe("createNominatimProvider", () => {
     expect(places[0]?.name).toBe("중구");
   });
 });
+
+/** 요청 URL을 기록하는 fetch 스텁 */
+function capturingFetch(body: unknown): { fetch: typeof globalThis.fetch; urls: string[] } {
+  const urls: string[] = [];
+  const fetch = (async (input: string | URL) => {
+    urls.push(String(input));
+    return { ok: true, status: 200, json: async () => body } as unknown as Response;
+  }) as unknown as typeof globalThis.fetch;
+  return { fetch, urls };
+}
+
+describe("nominatim search location biasing", () => {
+  const near = { latitude: 37.4979, longitude: 127.0276 }; // 강남역
+
+  it("bounds the query to a viewbox when near + radiusMeters are given", async () => {
+    const { fetch, urls } = capturingFetch(searchBody);
+    await provider.searchPlaces!(
+      { query: "coffee", near, radiusMeters: 2000, limit: 3 },
+      createTestContext(fetch),
+    );
+    const url = new URL(urls[0]!);
+    const viewbox = url.searchParams.get("viewbox");
+    expect(viewbox, "viewbox should be present").toBeTruthy();
+    expect(url.searchParams.get("bounded")).toBe("1");
+    // viewbox = left,top,right,bottom (경도/위도) — near를 감싸야 한다
+    const [left, top, right, bottom] = viewbox!.split(",").map(Number);
+    expect(left).toBeLessThan(near.longitude);
+    expect(right).toBeGreaterThan(near.longitude);
+    expect(top).toBeGreaterThan(near.latitude);
+    expect(bottom).toBeLessThan(near.latitude);
+  });
+
+  it("biases (viewbox, no bounded) when only near is given", async () => {
+    const { fetch, urls } = capturingFetch(searchBody);
+    await provider.searchPlaces!({ query: "coffee", near, limit: 3 }, createTestContext(fetch));
+    const url = new URL(urls[0]!);
+    expect(url.searchParams.get("viewbox")).toBeTruthy();
+    expect(url.searchParams.get("bounded")).toBeNull();
+  });
+
+  it("stays a global query when no near is given", async () => {
+    const { fetch, urls } = capturingFetch(searchBody);
+    await provider.searchPlaces!({ query: "coffee", limit: 3 }, createTestContext(fetch));
+    const url = new URL(urls[0]!);
+    expect(url.searchParams.get("viewbox")).toBeNull();
+    expect(url.searchParams.get("bounded")).toBeNull();
+  });
+});

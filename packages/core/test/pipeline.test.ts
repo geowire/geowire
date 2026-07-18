@@ -105,6 +105,28 @@ describe("Place 정규화", () => {
     expect(res.results[0]!.distanceMeters!).toBeLessThan(res.results[1]!.distanceMeters!);
   });
 
+  it("radiusMeters를 벗어난 결과를 하드 필터로 제외한다", async () => {
+    const geo = createGeoWire({
+      providers: [
+        fakeProvider({
+          id: "p",
+          search: [
+            // 약 157km 밖 — radiusMeters=10km에서 제외되어야 함
+            place({ providerPlaceId: "far", name: "먼곳", location: { latitude: 1, longitude: 1 } }),
+            // 약 157m — 반경 안, 유지
+            place({ providerPlaceId: "near", name: "가까운곳", location: { latitude: 0.001, longitude: 0.001 } }),
+          ],
+        }),
+      ],
+    });
+    const res = await geo.searchPlaces({
+      query: "x",
+      near: { latitude: 0, longitude: 0 },
+      radiusMeters: 10_000,
+    });
+    expect(res.results.map((r) => r.name)).toEqual(["가까운곳"]);
+  });
+
   it("limit을 적용한다", async () => {
     const geo = createGeoWire({
       providers: [

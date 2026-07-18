@@ -15,6 +15,30 @@ import { parseResults } from "./parse.js";
 
 const VERSION = "0.1.0";
 const DEFAULT_BASE_URL = "https://nominatim.openstreetmap.org";
+const METERS_PER_DEG_LAT = 111_320;
+/** near만 주어지고 radiusMeters가 없을 때 검색을 편향(bias)시킬 기본 반경 */
+const DEFAULT_BIAS_RADIUS_M = 25_000;
+
+/**
+ * near(+반경)를 Nominatim `viewbox`(경도/위도 경계상자)로 변환한다.
+ * radiusMeters가 명시되면 `bounded=1`로 해당 상자에 **하드 제한**하고,
+ * near만 있으면 viewbox는 우선순위 편향(bias)으로만 작동한다(밖 결과도 허용).
+ */
+function viewboxParams(
+  near: { latitude: number; longitude: number },
+  radiusMeters?: number,
+): { viewbox: string; bounded?: string } {
+  const radius = radiusMeters ?? DEFAULT_BIAS_RADIUS_M;
+  const latDelta = radius / METERS_PER_DEG_LAT;
+  const cosLat = Math.max(Math.cos((near.latitude * Math.PI) / 180), 0.01);
+  const lonDelta = radius / (METERS_PER_DEG_LAT * cosLat);
+  const left = near.longitude - lonDelta;
+  const right = near.longitude + lonDelta;
+  const top = near.latitude + latDelta;
+  const bottom = near.latitude - latDelta;
+  const viewbox = `${left},${top},${right},${bottom}`;
+  return radiusMeters != null ? { viewbox, bounded: "1" } : { viewbox };
+}
 
 export interface NominatimOptions {
   /** 자체 호스팅 Nominatim으로 전환 (공용 서버 부하 회피) */
@@ -65,12 +89,15 @@ export function createNominatimProvider(options: NominatimOptions = {}): GeoProv
     manifest: NOMINATIM_MANIFEST,
 
     async searchPlaces(req: SearchPlacesRequest, ctx) {
+      // near가 있으면 viewbox로 지역 제한/편향 — 없으면 전역 이름 검색이 되어
+      // "강남 근처 X"가 다른 대륙 결과를 반환하는 문제가 생긴다.
       const raw = await request(
         "/search",
         {
           q: req.query,
           limit: String(req.limit ?? 10),
           countrycodes: req.country?.toLowerCase(),
+          ...(req.near ? viewboxParams(req.near, req.radiusMeters) : {}),
         },
         ctx,
       );

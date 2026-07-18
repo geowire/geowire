@@ -32,6 +32,8 @@ export interface OperationSpec {
   country?: CountryCode;
   /** 거리 계산 기준점 (search near) */
   near?: LatLng;
+  /** 반경 상한(m). 지정 시 near 기준 이 반경을 벗어난 결과를 제외한다 */
+  radiusMeters?: number;
   /** 결과 상한 */
   limit?: number;
   options?: RequestOptions;

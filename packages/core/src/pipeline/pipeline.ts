@@ -120,11 +120,19 @@ export async function runOperation(
   const nowMs = host.now();
   const { used, skipped, failed, places } = classify(invocations, spec, nowMs);
 
+  // 4b. 반경 하드 필터 — radiusMeters가 지정되면 near 기준 반경을 벗어난 결과를 제외한다.
+  // 공급자의 위치 편향(bias)이 느슨해 반경 밖 결과가 새는 것을 계약 수준에서 막는다.
+  // 좌표가 없어 거리 미상(distanceMeters == null)인 결과는 보존한다.
+  const inRadius =
+    spec.radiusMeters != null
+      ? places.filter((p) => p.distanceMeters == null || p.distanceMeters <= spec.radiusMeters!)
+      : places;
+
   // 5. dedup (merge 전략만)
-  let working = places;
+  let working = inRadius;
   let dedupMeta: { before: number; after: number } | undefined;
   if (plan.strategy === "merge") {
-    const res = dedup(places, {
+    const res = dedup(inRadius, {
       mergeThreshold: host.config.dedup.mergeThreshold,
       providerRank: (id) => host.registry.get(id)?.priority ?? 0,
     });
