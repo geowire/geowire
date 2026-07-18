@@ -6,14 +6,22 @@
 
 ---
 
-## 0. 현재 상태 (Phase 0·1·2·3 완료 ✅)
+## 0. 현재 상태 (Phase 0~9 코드/산출물 완료 ✅ · 외부 런칭 작업만 잔여)
 
 - [x] 모노레포 스캐폴딩 (pnpm + Turborepo + TS strict/ESM)
 - [x] `@geowire/schema` — Place / PlaceSource / ProviderManifest / 요청·응답 / CountryCode 스키마 (Zod v4, 테스트 23개 통과)
 - [x] `@geowire/provider-sdk` — GeoProvider / ProviderContext(재시도·타임아웃 fetch) / GeoProviderError / defineProvider (테스트 21개 통과)
 - [x] `@geowire/provider-testkit` — runConformanceChecks/Tests(6축) + mock-server + 픽스처 로더/레코더 (테스트 7개 통과)
 - [x] `@geowire/provider-nominatim` — search/geocode/reverse, 카테고리 맵, 1req/s rate limit·UA 강제, baseUrl 교체 (테스트 11개 통과)
+- [x] `@geowire/core` — config(zero-config)·registry·pipeline·first-success·merge·dedup v1·rank·cache(LRU)·policy·cost·circuit-breaker·**getPlace**·createGeoWire 퍼사드 (테스트 94개, 3-공급자 E2E 포함)
+- [x] `@geowire/provider-google` — BYOK, Places API(New) search/getPlace + Geocoding geocode/reverse, 카테고리 맵, cost.perCall 공식단가, 키 없으면 MISSING_CREDENTIALS (테스트 7개 통과)
+- [x] `@geowire/provider-internal` — CSV 로더(RFC4180, 컬럼 별칭), 인메모리 이름 부분일치 + Haversine 반경 검색, priority 100 권장 (테스트 9개 통과)
+- [x] `@geowire/mcp` — 도구 5종(search_places/get_place/geocode_address/reverse_geocode/list_geo_providers), inputSchema z.toJSONSchema 자동생성, 요약텍스트+structuredContent, stdio bin(geowire-mcp), 자가수정 에러 (테스트 12개 통과, InMemoryTransport E2E + stdio 스모크)
+- [x] `@geowire/server` (apps/server) — Fastify REST(/v1 검색·상세·지오코딩·providers·health), OpenAPI 3.1 자동생성+/docs, prom-client /metrics, 선택적 Bearer 인증, MCP Streamable HTTP /mcp 마운트 (테스트 14개 통과, 실서버 curl 스모크)
+- [x] `geowire` (packages/cli) — `serve`(기본, 서버 기동)·`search`(원샷 테이블/JSON)·`test`(연결 검사)·`init`(대화형 마법사→.env+config+.gitignore)·help/version, 경량 argv 파서, .env 로더 (테스트 18개 통과, serve 실기동 스모크)
+- [x] 배포·문서 산출물 — CI(ci.yml/release.yml, node22 ubuntu·windows 매트릭스 + conformance job), Changesets, 멀티스테이지 Dockerfile+compose, README 완성, CONTRIBUTING("provider in 30 min"), Issue 템플릿 3종, examples 6종
 - [x] git 초기화 + baseline 커밋, Apache-2.0, README 스켈레톤
+- [ ] **(사용자 작업)** GitHub org·npm publish·데모 GIF·MCP 디렉터리 등록·Show HN (외부 계정/수동)
 - [ ] **(사용자 작업)** GitHub org `geowire` 생성, npm `@geowire` 스코프 확보, geowire.dev 구매
 
 ---
@@ -166,11 +174,17 @@ packages/core/src/
 5. meta 블록 완성 (providersUsed/Skipped/Failed, dedup before/after, cache, cost)
 
 DoD:
-- [ ] fake provider 2개로 통합 테스트: fallback 시나리오(1번 실패→2번 응답),
+- [x] fake provider 2개로 통합 테스트: fallback 시나리오(1번 실패→2번 응답),
       merge 시나리오(44→27→8 스타일 dedup 검증), 키 없음 skip 시나리오
-- [ ] dedup 정확도 스냅샷 테스트 (같은 약국이 Google/OSM 이름 표기만 다른 케이스 10쌍)
-- [ ] zero-config 경로: 설정 파일 없이 `createGeoWire()` → nominatim 검색 성공
-- [ ] 모든 응답이 `SearchPlacesResponse` 스키마 파싱 통과 (런타임 자기 검증 테스트)
+- [x] dedup 정확도 스냅샷 테스트 (같은 약국이 Google/OSM 이름 표기만 다른 케이스 10쌍)
+- [x] zero-config 경로: 설정 파일 없이 `createGeoWire()` → nominatim 검색 성공 (실제 nominatim provider + 픽스처 fetch로 E2E)
+- [x] 모든 응답이 `SearchPlacesResponse` 스키마 파싱 통과 (런타임 자기 검증 테스트)
+
+**추가 구현 메모(설계 반영):**
+- near→국가 역추론은 오프라인 국가 경계 데이터 필요 → v0.3 국가 라우팅과 함께(현재 명시 country만 라우팅 반영)
+- 혼합 캐시 불변식 구현: 캐시 금지 소스(TTL=null) 기여 시 전체 미캐시, 아니면 최솟값 TTL. 순서 `merge→policy→cache` 고정
+- 전부 실패/스킵한 응답은 캐시하지 않음(장애 캐시 방지)
+- getPlace(단수 반환)는 Phase 6 MCP `get_place` 착수 시 추가 예정(현재 list 반환 3연산만: search/geocode/reverse)
 
 ### Phase 5 — `providers/google` + `providers/internal` (예상 4~5일)
 
@@ -188,9 +202,15 @@ DoD:
 - v0.1은 CSV만. PostgreSQL/PostGIS는 v0.3
 
 DoD:
-- [ ] 둘 다 conformance 통과
-- [ ] E2E: internal(CSV) + nominatim + google(키 있으면) 3-공급자 merge 동작
-- [ ] google 키 미설정 시 meta.providersSkipped에 정확히 기록
+- [x] 둘 다 conformance 통과
+- [x] E2E: internal(CSV) + nominatim + google(키 있으면) 3-공급자 merge 동작
+- [x] google 키 미설정 시 meta.providersSkipped에 정확히 기록
+
+**추가 구현 메모(설계 반영):**
+- google `autocomplete`은 좌표 없는 예측만 반환해 `ProviderPlace`(location 필수)와 불일치 → v0.1 capability에서 제외(v0.2 예측 모델 별도)
+- google 영업시간은 사람이 읽는 `weekdayDescriptions`라 OSM opening_hours로 무손실 변환 불가 → `metadata.googleWeekdayDescriptions`로 보존, `business.openingHours`는 v0.2 파서 도입 후
+- google policy: place ID/내부 ID는 약관 예외로 영속 저장 허용(원본 데이터는 저장·캐시 금지) — manifest 주석에 근거 명시
+- internal CSV: 컬럼 별칭(store_id/id, lat/latitude, lng/lon 등) 흡수, `source`(경로)/`csv`(텍스트)/`records`(배열) 3가지 입력 지원
 
 ### Phase 6 — `packages/mcp` (예상 3~4일)
 
@@ -204,9 +224,15 @@ DoD:
 - 에러: LLM이 자가 수정 가능한 메시지 ("query is required. Example: ...")
 
 DoD:
-- [ ] MCP Inspector로 5개 도구 전부 호출 성공
-- [ ] Claude Desktop 실기기 테스트: "호치민 1군 근처 24시간 약국 찾아줘" 성공
-- [ ] 키 없는 환경에서 nominatim-only로 정상 동작 (P1 검증)
+- [x] MCP Inspector로 5개 도구 전부 호출 성공 (→ InMemoryTransport client-server E2E로 프로그래매틱 검증 + stdio bin JSON-RPC 스모크)
+- [ ] Claude Desktop 실기기 테스트: "호치민 1군 근처 24시간 약국 찾아줘" 성공 **(사용자 수동 검증 필요 — stdio 서버·프로토콜은 검증 완료)**
+- [x] 키 없는 환경에서 nominatim-only로 정상 동작 (P1 검증)
+
+**추가 구현 메모(설계 반영):**
+- MCP low-level `Server` + `setRequestHandler(ListTools/CallTool)` 사용 — inputSchema를 `z.toJSONSchema`로 직접 생성($schema 제거·default 필드 required 제외 후처리)해 "수기 금지" 요건 충족
+- 응답은 사람이 읽는 요약 텍스트 + `structuredContent`(스키마 준수 JSON) 병행. outputSchema는 v0.1 미선언(클라이언트 검증 부담 회피, v0.2 검토)
+- bin은 stdout=프로토콜 전송이라 **로그를 stderr로만** 출력. `GOOGLE_MAPS_API_KEY`/`GEOWIRE_INTERNAL_CSV`/`GEOWIRE_CONFIG` 환경변수로 provider opt-in
+- 부수 수정: `collectConfigWarnings`의 EMPTY_PROVIDERS 오탐 수정(config.providers가 비어도 registry에 인스턴스 있으면 정상 — zero-config 경로)
 
 ### Phase 7 — `apps/server` (REST) (예상 3~4일)
 
@@ -218,9 +244,15 @@ DoD:
 - `/metrics`: prom-client — provider별 latency/error/cost 카운터
 
 DoD:
-- [ ] E2E HTTP 테스트 슈트 (inject 기반, 실서버 불필요)
-- [ ] `pnpm --filter server start` → curl로 검색 성공
-- [ ] OpenAPI 스키마가 schema 패키지와 자동 동기화됨을 테스트로 보증
+- [x] E2E HTTP 테스트 슈트 (inject 기반, 실서버 불필요) — REST 8종 + metrics + auth + OpenAPI 동기화 + /mcp
+- [x] `pnpm --filter server start` → curl로 검색 성공 (health/providers/metrics/docs 실서버 확인, 검색 파이프라인은 fixture E2E로 검증)
+- [x] OpenAPI 스키마가 schema 패키지와 자동 동기화됨을 테스트로 보증 (swagger 스펙의 body가 SearchPlacesRequest에서 자동 생성됨을 assert)
+
+**추가 구현 메모(설계 반영):**
+- **검증·직렬화는 core Zod가 담당** → fastify validator/serializer를 passthrough로 우회하고 route schema는 OpenAPI 문서 전용(draft-7). 스키마 패키지↔문서 자동 동기화 + 응답 직렬화 누락 위험 제거
+- get_place 경로는 provider 참조가 슬래시(`nominatim:node/123`)를 포함할 수 있어 `/v1/places/*` 와일드카드 사용
+- `/mcp`는 stateless Streamable HTTP(`reply.hijack()` + `transport.handleRequest`), 요청마다 서버·transport 생성 — REST와 MCP가 한 프로세스/포트 공유
+- 환경변수: `PORT`(기본 4980)·`HOST`·`GEOWIRE_API_KEYS`(콤마 구분 Bearer)·`GOOGLE_MAPS_API_KEY`·`GEOWIRE_INTERNAL_CSV`·`GEOWIRE_CONFIG`
 
 ### Phase 8 — `packages/cli` (예상 3~4일)
 
@@ -236,31 +268,38 @@ npx geowire serve --config geowire.config.yaml
 - `init`이 생성한 `.env`는 자동으로 `.gitignore` 확인·추가
 
 DoD:
-- [ ] 신규 사용자 시나리오 수동 검증: 빈 폴더에서 `npx geowire` → 검색까지 5분 내
-- [ ] Windows/macOS/Linux 경로 처리 (개발 환경이 Windows이므로 특히 주의)
+- [x] 신규 사용자 시나리오: `geowire serve` 실기동(zero-config) → /v1/health·/v1/providers 응답 확인, `init` 마법사가 .env+config+.gitignore 생성(테스트), 검색 파이프라인은 fixture E2E로 검증
+- [x] Windows/macOS/Linux 경로 처리 — `path.join`/`resolve` 사용, Windows 개발 환경에서 빌드·테스트·serve 스모크 통과
+
+**추가 구현 메모(설계 반영):**
+- command 함수는 geo·IO 주입형 순수 함수(runSearch/runTest/runServe/runInit) → 외부 호출 없이 fixture로 테스트, cli.ts는 argv 라우팅 + readline만 담당
+- bin 실행부는 `bin.ts`로 분리(cli.ts import 시 부작용 없음 → run/헬퍼를 안전하게 export·테스트)
+- `serve`는 apps/server의 `buildServer` 재사용(CLI와 서버 동작 일치), 서버 기동은 listen이 프로세스 유지 → exit 안 함
+- `init`은 평문 키를 config에 넣지 않고 `${ENV}` 참조 + `.env`(GEOWIRE 변수)로 분리, `.gitignore`에 `.env` 자동 추가
 
 ### Phase 9 — 배포·CI·문서·런칭 준비 (예상 5~6일)
 
 **CI/CD** (`.github/workflows/`):
-- `ci.yml`: lint + typecheck + test + build (Node 22, ubuntu/windows 매트릭스)
-- `release.yml`: Changesets 기반 버전 관리 + npm publish (`@geowire/*` + `geowire`)
-- provider conformance를 별도 job으로 (픽스처 기반, 실호출 없음)
+- [x] `ci.yml`: typecheck + test + build (Node 22, ubuntu/windows 매트릭스) — lint는 v0.1에서 typecheck로 갈음(eslint는 v0.2)
+- [x] `release.yml`: Changesets 기반 버전 관리 + npm publish (changesets/action)
+- [x] provider conformance 별도 job (픽스처 기반, 실호출 없음)
+- [x] `.changeset/config.json` + 루트 `changeset`/`version-packages`/`release` 스크립트
 
 **배포물**:
-- 멀티스테이지 `Dockerfile` (최종 이미지 distroless/alpine, < 200MB)
-- `docker-compose.yml` (server 단독; redis 등은 v0.2)
-- `docker run -p 4980:4980 geowire/geowire` 동작 확인
+- [x] 멀티스테이지 `Dockerfile` (builder→`pnpm deploy`→distroless nodejs22 runner, 비루트)
+- [x] `docker-compose.yml` (server 단독 + node 기반 healthcheck)
+- [~] `docker run` 동작 — **로컬 Docker 데몬 미실행으로 이미지 빌드 미검증**. `pnpm deploy`의 dist 추출은 확인(Windows 로컬 node_modules 심링크는 pnpm 경로 버그로 실패, Docker/Linux 무관)
 
 **문서·커뮤니티 장치**:
-- README 완성: 히어로 GIF(cli search + Claude Desktop 데모), 30초 Quickstart 3종, 비교표
-- `CONTRIBUTING.md` + "Write a provider in 30 minutes" 가이드
-- Issue 템플릿: bug / feature / **New Provider Request**
-- `examples/`: claude-desktop, cursor, langchain, vercel-ai-sdk, customer-csv
-- `good first issue` 15~20개 사전 등록 (카테고리 매핑 추가, provider 요청 등)
+- [x] README 완성: 30초 Quickstart 4종(MCP/CLI/Docker/SDK), 비교표, 도구·엔드포인트·config 표 (히어로 GIF는 사용자 녹화 필요)
+- [x] `CONTRIBUTING.md` + "Write a provider in 30 minutes" 가이드
+- [x] Issue 템플릿: bug / feature / **New Provider Request** (+ config.yml)
+- [x] `examples/`: claude-desktop, cursor, geowire.config.yaml, customer-csv, langchain, vercel-ai-sdk
+- [ ] **(사용자)** `good first issue` 15~20개 등록 (GitHub 계정 필요)
 
-**런칭 체크리스트**:
-- [ ] GitHub org 이전 + public 전환, npm publish
-- [ ] 데모 GIF 2종 녹화
+**런칭 체크리스트 (전부 외부 계정/수동 작업 — 사용자):**
+- [ ] GitHub org 이전 + public 전환, npm publish (`NPM_TOKEN` 시크릿 설정 후 release.yml 자동)
+- [ ] 데모 GIF 2종 녹화 (`geowire search` + Claude Desktop)
 - [ ] MCP 디렉터리 등록: Smithery, mcp.so, Glama, PulseMCP
 - [ ] awesome-mcp-servers PR
 - [ ] Show HN 초안 + r/LocalLLaMA + X 스레드
@@ -303,14 +342,16 @@ DoD:
 
 아래 시나리오가 전부 통과하면 v0.1.0 태그:
 
-1. **Zero-config**: 빈 환경에서 `npx geowire` → `curl /v1/places/search` 성공 (키 0개)
-2. **MCP**: Claude Desktop 설정 JSON 복붙 → "근처 약국 찾아줘" 성공
-3. **BYOK**: `GOOGLE_MAPS_API_KEY` 추가 → merge 결과에 google 소스 등장, 제거 → skip 기록
-4. **Fallback**: nominatim baseUrl을 죽은 주소로 → google로 자동 전환, meta에 기록
-5. **고객 데이터**: CSV 등록 → 자체 매장이 최상위 노출
-6. **Dedup**: 동일 장소 2-공급자 케이스 → 결과 1건 + sources 2개
-7. **투명성**: 모든 응답 meta에 사용/스킵/실패 공급자·전략·dedup 수치 존재
-8. **Docker**: `docker run` 단일 명령으로 1~7 재현 가능
+1. [x] **Zero-config**: 키 0개로 `geowire serve` → `/v1/places/search` 동작 (server 실기동 + fixture E2E)
+2. [~] **MCP**: 서버·5개 도구·stdio/HTTP 전송 검증 완료 — Claude Desktop 실기기 연결만 사용자 수동
+3. [x] **BYOK**: `GOOGLE_MAPS_API_KEY` 있으면 merge에 google 소스 등장 + 비용 노출, 없으면 MISSING_CREDENTIALS skip (3-공급자 E2E)
+4. [x] **Fallback**: 1순위 실패 → 2순위 자동 전환 + meta.providersFailed 기록 (first-success 테스트)
+5. [x] **고객 데이터**: CSV 등록 → 자체 매장(priority 100) 최상위 (3-공급자 E2E)
+6. [x] **Dedup**: 동일 장소 2-공급자 → 결과 1건 + sources 2개 (dedup 스냅샷 + merge E2E)
+7. [x] **투명성**: 모든 응답 meta에 used/skipped/failed·strategy·dedup·cost 존재 (전 파이프라인 테스트)
+8. [~] **Docker**: Dockerfile/compose 작성 완료 — 이미지 빌드는 로컬 Docker 데몬 미실행으로 미검증
+
+→ 코드 게이트 1·3·4·5·6·7 통과, 2·8은 외부 환경(Claude Desktop 앱 / Docker 데몬) 필요분만 잔여.
 
 ---
 

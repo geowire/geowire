@@ -1,5 +1,5 @@
 {
-  "name": "geowire",
+  "name": "geowire-workspace",
   "private": true,
   "packageManager": "pnpm@10.28.0",
   "engines": {
@@ -8,9 +8,13 @@
   "scripts": {
     "build": "turbo run build",
     "test": "turbo run test",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "turbo run build && changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.0",
     "turbo": "^2.5.0"
   },
   "pnpm": {

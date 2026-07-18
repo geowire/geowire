@@ -1,0 +1,4 @@
+store_id,name,address,phone,latitude,longitude,opening_hours,category
+S001,Acme Coffee Gangnam,"123 Teheran-ro, Gangnam-gu, Seoul",02-111-2222,37.4979,127.0276,Mo-Su 07:00-22:00,cafe
+S002,Acme Coffee Hongdae,"45 Yanghwa-ro, Mapo-gu, Seoul",02-333-4444,37.5563,126.9220,Mo-Su 08:00-23:00,cafe
+S003,Acme Coffee Busan,"9 Haeundae-ro, Busan",051-555-6666,35.1631,129.1635,Mo-Fr 08:00-20:00,cafe

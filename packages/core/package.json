@@ -1,0 +1,35 @@
+{
+  "name": "@geowire/core",
+  "version": "0.1.0",
+  "description": "GeoWire core — pipeline, routing, dedup, policy engine (the heart)",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@geowire/schema": "workspace:*",
+    "@geowire/provider-sdk": "workspace:*",
+    "yaml": "^2.5.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@geowire/provider-nominatim": "workspace:*",
+    "@geowire/provider-google": "workspace:*",
+    "@geowire/provider-internal": "workspace:*",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "name": "@geowire/server",
+  "version": "0.1.0",
+  "description": "GeoWire REST API server (Fastify) — /v1 endpoints, OpenAPI, metrics, MCP over HTTP",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "geowire-server": "./dist/server.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@geowire/core": "workspace:*",
+    "@geowire/schema": "workspace:*",
+    "@geowire/provider-sdk": "workspace:*",
+    "@geowire/provider-nominatim": "workspace:*",
+    "@geowire/provider-google": "workspace:*",
+    "@geowire/provider-internal": "workspace:*",
+    "@geowire/mcp": "workspace:*",
+    "@fastify/swagger": "^9.8.0",
+    "@fastify/swagger-ui": "^6.1.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "fastify": "^5.10.0",
+    "prom-client": "^15.1.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}

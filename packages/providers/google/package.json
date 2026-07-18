@@ -1,0 +1,31 @@
+{
+  "name": "@geowire/provider-google",
+  "version": "0.1.0",
+  "description": "GeoWire Google Maps Platform provider — BYOK (Places API New + Geocoding)",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@geowire/schema": "workspace:*",
+    "@geowire/provider-sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@geowire/provider-testkit": "workspace:*",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}
