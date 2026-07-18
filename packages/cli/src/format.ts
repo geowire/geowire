@@ -49,3 +49,22 @@ export function formatSearchTable(results: Place[], meta: ResponseMeta): string 
   if (meta.attributions.length) parts.push(`Attribution: ${meta.attributions.join("; ")}`);
   return parts.join("\n");
 }
+
+/** 단일 장소 상세를 사람이 읽기 좋은 블록으로 (`geowire get`용). */
+export function formatPlace(p: Place): string {
+  const lines: (string | undefined)[] = [
+    p.name,
+    p.address?.formatted ? `  ${p.address.formatted}` : undefined,
+    `  (${p.location.latitude}, ${p.location.longitude})`,
+    p.categories.length ? `  categories: ${p.categories.join(", ")}` : undefined,
+    p.business?.openingHours ? `  hours: ${p.business.openingHours}` : undefined,
+    p.business?.rating != null
+      ? `  rating: ${p.business.rating}${p.business.priceLevel != null ? ` · price ${"$".repeat(p.business.priceLevel || 1)}` : ""}`
+      : undefined,
+    p.contact?.phone ? `  phone: ${p.contact.phone}` : undefined,
+    p.contact?.website ? `  website: ${p.contact.website}` : undefined,
+    `  sources: ${p.sources.map((s) => `${s.provider}:${s.providerPlaceId}`).join(", ")}`,
+    p.attributions.length ? `  ${p.attributions.join("; ")}` : undefined,
+  ];
+  return lines.filter((l): l is string => l != null).join("\n");
+}

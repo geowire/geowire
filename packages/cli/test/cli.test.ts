@@ -9,8 +9,12 @@ import { parseFlags, parseNear, flagInt } from "../src/args.js";
 import { parseDotEnv, buildEnvContent, ensureGitignore } from "../src/env.js";
 import { buildEnvVars, buildConfigYaml, runInit } from "../src/commands/init.js";
 import { runSearch } from "../src/commands/search.js";
+import { runReverse } from "../src/commands/reverse.js";
+import { runGet } from "../src/commands/get.js";
 import { runTest } from "../src/commands/test.js";
+import { formatPlace } from "../src/format.js";
 import { run } from "../src/cli.js";
+import type { Place } from "@geowirehq/schema";
 
 const NOMI = [
   {
@@ -147,6 +151,54 @@ describe("runSearch", () => {
   });
 });
 
+describe("runReverse", () => {
+  it("좌표를 표로 리버스 지오코딩한다", async () => {
+    const { io, out } = capture();
+    const code = await runReverse(fixtureGeo(), { location: { latitude: 37.4979, longitude: 127.0276 } }, io);
+    expect(code).toBe(0);
+    expect(out.join("\n")).toContain("블루보틀 강남");
+  });
+
+  it("--json은 원시 응답을 출력한다", async () => {
+    const { io, out } = capture();
+    await runReverse(fixtureGeo(), { location: { latitude: 37.4979, longitude: 127.0276 }, json: true }, io);
+    expect(JSON.parse(out.join("\n")).results[0].name).toBe("블루보틀 강남");
+  });
+});
+
+describe("runGet", () => {
+  it("getPlace 미지원 참조는 에러(1)를 반환한다", async () => {
+    const { io, err } = capture();
+    const code = await runGet(fixtureGeo(), { id: "nominatim:node/1" }, io);
+    expect(code).toBe(1);
+    expect(err.join("\n")).toContain("No place found");
+  });
+});
+
+describe("formatPlace", () => {
+  it("이름·주소·좌표·연락처·출처를 렌더한다", () => {
+    const p: Place = {
+      id: "gwp_google_x",
+      name: "Blue Bottle",
+      categories: ["cafe"],
+      location: { latitude: 37.5, longitude: 127.0 },
+      address: { formatted: "1 Teheran-ro, Seoul" },
+      contact: { phone: "+82-2-000-0000", website: "https://example.com" },
+      business: { openingHours: "Mon-Fri 08:00-20:00", rating: 4.5, priceLevel: 2 },
+      sources: [{ provider: "google", providerPlaceId: "x", fetchedAt: "2026-07-18T00:00:00.000Z" }],
+      attributions: ["© Google"],
+    };
+    const text = formatPlace(p);
+    expect(text).toContain("Blue Bottle");
+    expect(text).toContain("1 Teheran-ro, Seoul");
+    expect(text).toContain("(37.5, 127)");
+    expect(text).toContain("hours: Mon-Fri 08:00-20:00");
+    expect(text).toContain("phone: +82-2-000-0000");
+    expect(text).toContain("google:x");
+    expect(text).toContain("© Google");
+  });
+});
+
 describe("runTest", () => {
   it("연결된 공급자를 ✓로 보고한다", async () => {
     const { io, out } = capture();
@@ -166,13 +218,25 @@ describe("run 라우팅", () => {
   it("version", async () => {
     const { io, out } = capture();
     await run(["version"], io);
-    expect(out.join("\n")).toContain("geowire 0.1.0");
+    expect(out.join("\n")).toContain("geowire 0.1.2");
   });
 
   it("search without query → 사용법 에러(1)", async () => {
     const { io, err } = capture();
     expect(await run(["search"], io)).toBe(1);
     expect(err.join("\n")).toContain("usage: geowire search");
+  });
+
+  it("reverse without coords → 사용법 에러(1)", async () => {
+    const { io, err } = capture();
+    expect(await run(["reverse"], io)).toBe(1);
+    expect(err.join("\n")).toContain("usage: geowire reverse");
+  });
+
+  it("get without id → 사용법 에러(1)", async () => {
+    const { io, err } = capture();
+    expect(await run(["get"], io)).toBe(1);
+    expect(err.join("\n")).toContain("usage: geowire get");
   });
 
   it("알 수 없는 명령 → 1", async () => {

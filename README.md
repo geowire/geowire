@@ -16,6 +16,14 @@ enforces each provider's caching/attribution terms.
 
 **Status: v0.1 ("It works") — published on npm. MCP · REST · CLI · SDK all functional.**
 
+> **Honest by design:** OpenStreetMap (the zero-key default) is a great
+> *geocoder* — strong on place names, addresses, and landmarks — but thin on
+> category words ("coffee", "pharmacy"), opening hours, and coverage outside
+> Europe. Add a Google key for full business data; GeoWire merges both and tells
+> you which source every field came from.
+
+**Contents:** [Why](#why-geowire) · [Quickstart](#quickstart) · [MCP tools](#mcp-tools) · [REST](#rest-endpoints) · [Anatomy of a response](#anatomy-of-a-response) · [Config](#configuration-optional--everything-works-without-it) · [Providers](#providers) · [Recipes & examples](#recipes--examples) · [Roadmap](#roadmap) · [Architecture](#architecture)
+
 ## Why GeoWire?
 
 |  | Direct integration | Single-provider MCP | **GeoWire** |
@@ -43,9 +51,10 @@ Add this to your MCP client config (e.g. Claude Desktop `claude_desktop_config.j
 }
 ```
 
-Then ask: *"Find a 24-hour pharmacy near District 1, Ho Chi Minh City."*
-Works with **zero API keys** — OpenStreetMap is the default provider.
-Add `"env": { "GOOGLE_MAPS_API_KEY": "..." }` to enable Google.
+Then ask: *"Where is the Eiffel Tower?"* or *"Find a Starbucks within 3 km of
+37.4979, 127.0276."* Works with **zero API keys** — OpenStreetMap is the default.
+Add `"env": { "GOOGLE_MAPS_API_KEY": "..." }` for business listings and hours
+(e.g. *"Find a 24-hour pharmacy near me"*). See [more MCP client configs](./examples/mcp-clients.md).
 
 ### 2. CLI — one-shot search & server
 
@@ -56,10 +65,14 @@ Add `"env": { "GOOGLE_MAPS_API_KEY": "..." }` to enable Google.
 ```bash
 npx @geowirehq/cli search "Eiffel Tower"          # terminal search with a results table
 npx @geowirehq/cli search "Starbucks" --near 37.4979,127.0276 --radius 3000   # near a coordinate
+npx @geowirehq/cli reverse 37.5665,126.9780       # coordinate → nearest place
+npx @geowirehq/cli get google:ChIJ...             # one place by reference (getPlace-capable provider)
 npx @geowirehq/cli                                # start the REST + MCP server (zero-config)
 npx @geowirehq/cli init                           # interactive setup wizard (.env + config)
 npx @geowirehq/cli test                           # check provider connections
 ```
+
+Add `--json` to any command for the full response (results + provenance `meta`).
 
 ### 3. Docker — self-hosted server
 
@@ -68,7 +81,7 @@ docker run -p 4980:4980 geowire/geowire
 # then:
 curl -X POST http://localhost:4980/v1/places/search \
   -H 'content-type: application/json' \
-  -d '{"query":"pharmacy","near":{"latitude":10.7769,"longitude":106.7009}}'
+  -d '{"query":"Starbucks","near":{"latitude":37.4979,"longitude":127.0276},"radiusMeters":3000}'
 ```
 
 Or with `docker compose up` (see `docker-compose.yml`). API docs at `/docs`.
@@ -81,10 +94,13 @@ import { createNominatimProvider } from "@geowirehq/provider-nominatim";
 
 const geo = createGeoWire({ providers: [createNominatimProvider()] });
 const { results, meta } = await geo.searchPlaces({
-  query: "coffee",
-  near: { latitude: 37.5, longitude: 127.0 },
+  query: "Starbucks",
+  near: { latitude: 37.4979, longitude: 127.0276 },
+  radiusMeters: 3000,
 });
 ```
+
+Full embedded-SDK guide: [`examples/typescript-sdk.md`](./examples/typescript-sdk.md).
 
 ## MCP tools
 
@@ -115,6 +131,40 @@ Every response includes both a human-readable summary and `structuredContent`
 
 Optional Bearer auth: set `GEOWIRE_API_KEYS=key1,key2`.
 
+## Anatomy of a response
+
+No black box. Every response carries a `meta` block: which providers were
+**used / skipped / failed** (and why), dedup counts, cache status, estimated
+cost, and per-field sourcing — so you always know where each value came from.
+
+```jsonc
+{
+  "results": [{
+    "id": "gwp_CvWvRZrFtegkJPxP9CW0",
+    "name": "경복궁",
+    "location": { "latitude": 37.579754, "longitude": 126.9766818 },
+    "sources": [{
+      "provider": "nominatim",
+      "providerPlaceId": "relation/5501517",
+      "fields": ["name", "location", "categories", "address"]   // ← what this source contributed
+    }],
+    "attributions": ["© OpenStreetMap contributors"]
+  }],
+  "meta": {
+    "providersUsed":   [{ "provider": "nominatim", "resultCount": 1, "latencyMs": 2449 }],
+    "providersSkipped": [],   // e.g. { provider: "google", reason: "MISSING_CREDENTIALS" | "QUOTA_EXCEEDED" }
+    "providersFailed":  [],   // e.g. { provider: "google", reason: "TIMEOUT" }
+    "strategy": "first-success",
+    "cache": { "hit": false }
+    // merging adds:  "dedup": { "before": 3, "after": 1 }
+    // paid provider: "estimatedCostUSD": 0.032
+  }
+}
+```
+
+After a merge, `sources[].fields` shows (say) the phone came from Google while
+the coordinates came from OSM. Walkthrough: [docs/recipes.md](./docs/recipes.md#4-read-a-response-provenance--transparency).
+
 ## Configuration (optional — everything works without it)
 
 `geowire.config.yaml`:
@@ -143,6 +193,30 @@ Keys come from the environment (`${VAR}`), never committed in plaintext.
 Want another provider? See [CONTRIBUTING.md](./CONTRIBUTING.md) —
 *"Write a provider in 30 minutes"*.
 
+## Recipes & examples
+
+- **[docs/recipes.md](./docs/recipes.md)** — end-to-end recipes: near+radius
+  search, merge + dedup, cost budgets, country routing, your own CSV, self-host.
+- **[examples/mcp-clients.md](./examples/mcp-clients.md)** — configs for Claude
+  Desktop/Code, Cursor, Cline, VS Code, Windsurf.
+- **[examples/typescript-sdk.md](./examples/typescript-sdk.md)** — embed the SDK.
+- **[examples/llm-tool-use.md](./examples/llm-tool-use.md)** — raw OpenAI /
+  Anthropic function calling. Also [LangChain](./examples/langchain.md) ·
+  [Vercel AI SDK](./examples/vercel-ai-sdk.md).
+
+## Roadmap
+
+v0.1 is deliberately "It works" scope. Honest about what's **not** in it yet:
+
+| Area | v0.1 | Planned |
+|---|---|---|
+| Operations | search, geocode, reverse-geocode, get-place | **autocomplete** (typed, not wired) |
+| Strategies | `first-success`, `merge` | `cost-aware`, `fastest`, `weighted` (v0.3) |
+| Routing | explicit `country` | country **inference** from coordinates (v0.3) |
+| Cache | in-memory (LRU) | **Redis** adapter (v0.2) |
+| Providers | OSM, Google, your CSV | Mapbox, Foursquare, Kakao, Naver (community PRs welcome) |
+| Rate limiting | per-provider (OSM 1 req/s) | global / per-endpoint |
+
 ## Architecture
 
 ```
@@ -160,10 +234,10 @@ Monorepo packages: `schema` · `provider-sdk` · `provider-testkit` · `core` ·
 
 ## Documentation
 
-- [System design](./GeoWire_system_design.md)
-- [Implementation plan](./IMPLEMENTATION_PLAN.md)
+- [Recipes / cookbook](./docs/recipes.md) — task-oriented, copy-pasteable
+- [Examples](./examples/) — MCP clients, SDK, LangChain, AI SDK, tool use
 - [Contributing + write a provider](./CONTRIBUTING.md)
-- Examples: [`examples/`](./examples/)
+- [System design](./GeoWire_system_design.md)
 
 ## License
 

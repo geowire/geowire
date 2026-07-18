@@ -1,6 +1,6 @@
 {
   "name": "@geowirehq/cli",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "GeoWire CLI — zero-config geo API server, one-shot search, provider setup wizard",
   "license": "Apache-2.0",
   "type": "module",

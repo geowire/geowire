@@ -7,6 +7,8 @@ import { consoleIO, type IO } from "./io.js";
 import { loadDotEnv } from "./env.js";
 import { parseFlags, parseNear, flagInt } from "./args.js";
 import { runSearch } from "./commands/search.js";
+import { runReverse } from "./commands/reverse.js";
+import { runGet } from "./commands/get.js";
 import { runTest } from "./commands/test.js";
 import { runServe } from "./commands/serve.js";
 import { runInit } from "./commands/init.js";
@@ -31,6 +33,11 @@ Usage:
   geowire search <query>           One-shot search in the terminal
                 [--near lat,lon] [--radius m] [--limit n]
                 [--country CC] [--strategy first-success|merge] [--json]
+  geowire reverse <lat,lon>        Reverse-geocode a coordinate → nearest place
+                [--json]
+  geowire get <provider:id>        Fetch one place by provider reference
+                [--json]           (needs a getPlace-capable provider, e.g.
+                                    Google: geowire get google:ChIJN1t_tDeuEmsR...)
   geowire test                     Check configured provider connections
   geowire init                     Interactive setup wizard (.env + config)
   geowire help | version
@@ -74,6 +81,28 @@ async function searchCmd(rest: string[], io: IO): Promise<number> {
   );
 }
 
+async function reverseCmd(rest: string[], io: IO): Promise<number> {
+  const { _, flags } = parseFlags(rest);
+  const location = parseNear(_.join(""));
+  if (!location) {
+    io.err('usage: geowire reverse <lat,lon>   e.g. geowire reverse 37.5665,126.9780');
+    return 1;
+  }
+  const geo = createGeoFromEnv(logger);
+  return runReverse(geo, { location, json: flags.json === true }, io);
+}
+
+async function getCmd(rest: string[], io: IO): Promise<number> {
+  const { _, flags } = parseFlags(rest);
+  const id = _[0]?.trim();
+  if (!id) {
+    io.err('usage: geowire get <provider:id>   e.g. geowire get nominatim:node/240109189');
+    return 1;
+  }
+  const geo = createGeoFromEnv(logger);
+  return runGet(geo, { id, json: flags.json === true }, io);
+}
+
 async function initCmd(io: IO): Promise<number> {
   const rl = createInterface({ input: process.stdin, output: process.stdout });
   try {
@@ -93,6 +122,10 @@ export async function run(argv: string[], io: IO = consoleIO): Promise<number> {
       return serveCmd(rest, io);
     case "search":
       return searchCmd(rest, io);
+    case "reverse":
+      return reverseCmd(rest, io);
+    case "get":
+      return getCmd(rest, io);
     case "test":
       return runTest(createGeoFromEnv(logger), io);
     case "init":
@@ -105,7 +138,7 @@ export async function run(argv: string[], io: IO = consoleIO): Promise<number> {
     case "version":
     case "--version":
     case "-v":
-      io.out("geowire 0.1.0");
+      io.out("geowire 0.1.2");
       return 0;
     default:
       io.err(`Unknown command: ${cmd}\n`);
