@@ -54,9 +54,11 @@ export const TOOL_DEFS: Tool[] = [
     name: "get_place",
     description:
       "Fetch full details for a single place by its provider reference id, in the form " +
-      "'provider:providerPlaceId' (e.g. 'google:ChIJN1t_tDeuEmsRUsoyG83frY4' or 'nominatim:node/240109189'), " +
-      "as found in a place's `sources`. Internal 'gwp_' ids cannot be resolved directly — re-query via a " +
-      'provider reference. Example: {"id": "nominatim:node/240109189"}.',
+      "'provider:providerPlaceId' (e.g. 'google:ChIJN1t_tDeuEmsRUsoyG83frY4'), as found in a place's `sources`. " +
+      "Only providers that support getPlace can resolve a reference — currently Google (needs an API key). " +
+      "OpenStreetMap/Nominatim does not, so a 'nominatim:...' reference returns nothing; use search_places or " +
+      "geocode_address for OSM instead. Internal 'gwp_' ids cannot be resolved directly. " +
+      'Example: {"id": "google:ChIJN1t_tDeuEmsRUsoyG83frY4"}.',
     inputSchema: toInputSchema(GetPlaceRequest),
   },
   {
