@@ -2,7 +2,7 @@
 
 ## Option A — MCP (recommended)
 
-GeoWire's tools load directly via MCP. Start the HTTP server (`npx geowire`) and
+GeoWire's tools load directly via MCP. Start the HTTP server (`npx @geowirehq/cli`) and
 connect the AI SDK's MCP client:
 
 ```ts

@@ -22,10 +22,10 @@ Extra columns are ignored. Rows without a name or valid coordinates are skipped.
 
 ```bash
 # CLI / server
-GEOWIRE_INTERNAL_CSV=./my-places.csv npx geowire search "Acme Coffee"
+GEOWIRE_INTERNAL_CSV=./my-places.csv npx @geowirehq/cli search "Acme Coffee"
 
 # or via config (recommended — set priority so your data ranks first)
-npx geowire --config ./geowire.config.yaml
+npx @geowirehq/cli --config ./geowire.config.yaml
 ```
 
 ```yaml

@@ -4,7 +4,7 @@ GeoWire exposes a plain REST API, so any Python agent can call it. Start the
 server first:
 
 ```bash
-npx geowire            # http://localhost:4980
+npx @geowirehq/cli            # http://localhost:4980
 ```
 
 ## Plain REST (requests)

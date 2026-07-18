@@ -257,11 +257,11 @@ DoD:
 ### Phase 8 — `packages/cli` (예상 3~4일)
 
 ```bash
-npx geowire            # zero-config 서버 기동 (= serve의 기본형)
-npx geowire init       # 대화형 마법사: provider 선택→키 입력→.env+config 생성→연결 검사
-npx geowire test       # 등록된 공급자 연결 검사 ("✓ Google Places connected")
-npx geowire search "coffee near Gangnam"   # 터미널 원샷 검색 (데모 킬러 기능)
-npx geowire serve --config geowire.config.yaml
+npx @geowirehq/cli            # zero-config 서버 기동 (= serve의 기본형)
+npx @geowirehq/cli init       # 대화형 마법사: provider 선택→키 입력→.env+config 생성→연결 검사
+npx @geowirehq/cli test       # 등록된 공급자 연결 검사 ("✓ Google Places connected")
+npx @geowirehq/cli search "coffee near Gangnam"   # 터미널 원샷 검색 (데모 킬러 기능)
+npx @geowirehq/cli serve --config geowire.config.yaml
 ```
 
 - `search`는 결과 테이블 + 출처·응답시간 표시 (README GIF 재료)
@@ -317,7 +317,7 @@ DoD:
 | W4 | Phase 4 (dedup, rank, cache, policy, meta) | 3-공급자 merge + dedup 데모 |
 | W5 | Phase 5 (google, internal CSV) | BYOK + 고객 데이터 우선순위 동작 |
 | W6 | Phase 6 (MCP) | Claude Desktop 실사용 성공 ⭐ |
-| W7 | Phase 7 + 8 (REST, CLI) | `npx geowire` 5분 시나리오 통과 |
+| W7 | Phase 7 + 8 (REST, CLI) | `npx @geowirehq/cli` 5분 시나리오 통과 |
 | W8 | Phase 9 (CI, Docker, 문서, 런칭) | **v0.1.0 publish + 런칭** 🚀 |
 
 버퍼: dedup 품질(W4)과 MCP 도구 설명 튜닝(W6)이 지연 위험 최대 —

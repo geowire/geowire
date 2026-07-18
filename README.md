@@ -46,10 +46,10 @@ Add `"env": { "GOOGLE_MAPS_API_KEY": "..." }` to enable Google.
 ### 2. CLI — one-shot search & server
 
 ```bash
-npx geowire search "coffee near Gangnam"   # terminal search with a results table
-npx geowire                                # start the REST + MCP server (zero-config)
-npx geowire init                           # interactive setup wizard (.env + config)
-npx geowire test                           # check provider connections
+npx @geowirehq/cli search "coffee near Gangnam"   # terminal search with a results table
+npx @geowirehq/cli                                # start the REST + MCP server (zero-config)
+npx @geowirehq/cli init                           # interactive setup wizard (.env + config)
+npx @geowirehq/cli test                           # check provider connections
 ```
 
 ### 3. Docker — self-hosted server
