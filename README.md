@@ -4,13 +4,17 @@
 >
 > One place-search interface for every AI and map provider.
 
+<p align="center">
+  <img src="docs/media/geowire-mcp.gif" alt="geowire MCP server — tools/list and a geocode_address call over stdio" width="760">
+</p>
+
 GeoWire is an open-source geo search gateway that sits between AI agents and
 map/place data providers (OpenStreetMap, Google, your own data) and exposes them
 through a single **MCP server**, **REST API**, and **SDK** — with provider
 fallback, multi-provider merge + dedup, cost budgets, and a policy engine that
 enforces each provider's caching/attribution terms.
 
-**Status: v0.1 ("It works") — MCP · REST · CLI · SDK all functional. Not yet published to npm.**
+**Status: v0.1 ("It works") — published on npm. MCP · REST · CLI · SDK all functional.**
 
 ## Why GeoWire?
 
@@ -45,8 +49,13 @@ Add `"env": { "GOOGLE_MAPS_API_KEY": "..." }` to enable Google.
 
 ### 2. CLI — one-shot search & server
 
+<p align="center">
+  <img src="docs/media/geowire-search.gif" alt="geowire search in the terminal, with source attribution and response time" width="720">
+</p>
+
 ```bash
-npx @geowirehq/cli search "coffee near Gangnam"   # terminal search with a results table
+npx @geowirehq/cli search "Eiffel Tower"          # terminal search with a results table
+npx @geowirehq/cli search "coffee" --near 37.4979,127.0276   # bias to a coordinate
 npx @geowirehq/cli                                # start the REST + MCP server (zero-config)
 npx @geowirehq/cli init                           # interactive setup wizard (.env + config)
 npx @geowirehq/cli test                           # check provider connections
