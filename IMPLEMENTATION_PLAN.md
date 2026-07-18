@@ -6,7 +6,7 @@
 
 ---
 
-## 0. 현재 상태 (Phase 0~9 코드/산출물 완료 ✅ · 외부 런칭 작업만 잔여)
+## 0. 현재 상태 (Phase 0~9 완료 ✅ · Docker 검증됨 · 외부 런칭 작업만 잔여)
 
 - [x] 모노레포 스캐폴딩 (pnpm + Turborepo + TS strict/ESM)
 - [x] `@geowire/schema` — Place / PlaceSource / ProviderManifest / 요청·응답 / CountryCode 스키마 (Zod v4, 테스트 23개 통과)
@@ -286,9 +286,9 @@ DoD:
 - [x] `.changeset/config.json` + 루트 `changeset`/`version-packages`/`release` 스크립트
 
 **배포물**:
-- [x] 멀티스테이지 `Dockerfile` (builder→`pnpm deploy`→distroless nodejs22 runner, 비루트)
+- [x] 멀티스테이지 `Dockerfile` (builder→`pnpm deploy --legacy`→distroless nodejs22 runner, 비루트)
 - [x] `docker-compose.yml` (server 단독 + node 기반 healthcheck)
-- [~] `docker run` 동작 — **로컬 Docker 데몬 미실행으로 이미지 빌드 미검증**. `pnpm deploy`의 dist 추출은 확인(Windows 로컬 node_modules 심링크는 pnpm 경로 버그로 실패, Docker/Linux 무관)
+- [x] `docker run` 동작 검증 — `docker build` 성공(이미지 267MB), 컨테이너에서 /v1/health·/v1/providers·/docs 응답 + 실제 Nominatim 검색("Tour Eiffel") E2E 통과. `pnpm deploy --legacy`는 Linux 컨테이너에서 정상(Windows 로컬 심링크 실패는 pnpm 경로 버그로 Docker 무관 확인됨)
 
 **문서·커뮤니티 장치**:
 - [x] README 완성: 30초 Quickstart 4종(MCP/CLI/Docker/SDK), 비교표, 도구·엔드포인트·config 표 (히어로 GIF는 사용자 녹화 필요)
@@ -349,9 +349,9 @@ DoD:
 5. [x] **고객 데이터**: CSV 등록 → 자체 매장(priority 100) 최상위 (3-공급자 E2E)
 6. [x] **Dedup**: 동일 장소 2-공급자 → 결과 1건 + sources 2개 (dedup 스냅샷 + merge E2E)
 7. [x] **투명성**: 모든 응답 meta에 used/skipped/failed·strategy·dedup·cost 존재 (전 파이프라인 테스트)
-8. [~] **Docker**: Dockerfile/compose 작성 완료 — 이미지 빌드는 로컬 Docker 데몬 미실행으로 미검증
+8. [x] **Docker**: `docker build` 성공(267MB) → `docker run -p 4980:4980`로 health·providers·docs·실검색 재현 확인
 
-→ 코드 게이트 1·3·4·5·6·7 통과, 2·8은 외부 환경(Claude Desktop 앱 / Docker 데몬) 필요분만 잔여.
+→ 게이트 1·3·4·5·6·7·8 통과, **2(MCP)는 Claude Desktop 실기기 연결만** 사용자 수동 잔여.
 
 ---
 
