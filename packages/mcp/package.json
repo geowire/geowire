@@ -1,6 +1,7 @@
 {
   "name": "@geowirehq/mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "mcpName": "io.github.geowire/geowire",
   "description": "GeoWire MCP server — search_places, get_place, geocode_address, reverse_geocode, list_geo_providers",
   "license": "Apache-2.0",
   "type": "module",

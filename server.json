@@ -1,19 +1,19 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.geowire/geowire",
-  "description": "One place-search interface for every AI and map provider (OpenStreetMap, Google, your own data) — provider fallback, multi-provider merge + dedup, cost budgets, policy engine. Works with zero API keys.",
+  "description": "Unified place search for OpenStreetMap, Google & your own data. Fallback, merge, zero API keys.",
   "repository": {
     "url": "https://github.com/geowire/geowire",
     "source": "github"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "websiteUrl": "https://geowire.dev",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@geowirehq/mcp",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "transport": {
         "type": "stdio"
       },
