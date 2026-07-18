@@ -1,4 +1,4 @@
-import type { Logger, Clock, FetchFn } from "@geowire/provider-sdk";
+import type { Logger, Clock, FetchFn } from "@geowirehq/provider-sdk";
 import type {
   Place,
   ProviderErrorCode,
@@ -6,7 +6,7 @@ import type {
   ProviderUsage,
   ResponseMeta,
   Strategy,
-} from "@geowire/schema";
+} from "@geowirehq/schema";
 import type { GeoWireConfig } from "../config/schema.js";
 import type { ProviderRegistry } from "../registry.js";
 import type { CacheAdapter } from "../cache/adapter.js";

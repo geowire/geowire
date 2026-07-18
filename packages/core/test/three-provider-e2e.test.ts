@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { createNominatimProvider } from "@geowire/provider-nominatim";
-import { createGoogleProvider } from "@geowire/provider-google";
-import { createInternalProvider } from "@geowire/provider-internal";
+import { createNominatimProvider } from "@geowirehq/provider-nominatim";
+import { createGoogleProvider } from "@geowirehq/provider-google";
+import { createInternalProvider } from "@geowirehq/provider-internal";
 import { createGeoWire } from "../src/geowire.js";
 
 /** GS25 강남점을 nominatim과 google이 서로 다른 표기로 반환 (같은 좌표 → 병합 대상) */

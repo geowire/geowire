@@ -1,5 +1,5 @@
-import { GeoProviderError } from "@geowire/provider-sdk";
-import type { GetPlaceRequest, Place } from "@geowire/schema";
+import { GeoProviderError } from "@geowirehq/provider-sdk";
+import type { GetPlaceRequest, Place } from "@geowirehq/schema";
 import { parsePlaceRef } from "../ids.js";
 import { makeContext, type ExecuteDeps } from "./execute.js";
 import { toPlace } from "./to-place.js";

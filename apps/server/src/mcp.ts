@@ -1,7 +1,7 @@
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { createGeoWireMcpServer } from "@geowire/mcp";
+import { createGeoWireMcpServer } from "@geowirehq/mcp";
 import type { FastifyInstance } from "fastify";
-import type { GeoWire } from "@geowire/core";
+import type { GeoWire } from "@geowirehq/core";
 
 /**
  * MCP를 Streamable HTTP로 같은 프로세스에 마운트한다 (설계 §9.2, `/mcp`).

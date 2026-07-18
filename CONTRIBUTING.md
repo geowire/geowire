@@ -54,7 +54,7 @@ core's job. Adapters stay ~200 lines.
 
 ```
 packages/providers/<name>/
-  package.json      # name: @geowire/provider-<name>, deps: @geowire/schema, @geowire/provider-sdk
+  package.json      # name: @geowirehq/provider-<name>, deps: @geowirehq/schema, @geowirehq/provider-sdk
   tsconfig.json     # extends ../../../tsconfig.base.json
   src/
     manifest.ts     # capabilities, auth, cost, policy
@@ -68,7 +68,7 @@ packages/providers/<name>/
 ### 2. Declare a manifest
 
 ```ts
-import type { ProviderManifest } from "@geowire/schema";
+import type { ProviderManifest } from "@geowirehq/schema";
 
 export const MY_MANIFEST: ProviderManifest = {
   id: "myprovider",
@@ -90,7 +90,7 @@ export const MY_MANIFEST: ProviderManifest = {
 match implemented methods at construction time.
 
 ```ts
-import { defineProvider, errorFromHttpStatus, GeoProviderError } from "@geowire/provider-sdk";
+import { defineProvider, errorFromHttpStatus, GeoProviderError } from "@geowirehq/provider-sdk";
 import { MY_MANIFEST } from "./manifest.js";
 import { parseResults } from "./parse.js";
 
@@ -116,7 +116,7 @@ Rules:
 ### 4. Pass the testkit
 
 ```ts
-import { runConformanceTests } from "@geowire/provider-testkit";
+import { runConformanceTests } from "@geowirehq/provider-testkit";
 import { createMyProvider } from "../src/index.js";
 
 runConformanceTests(createMyProvider({ apiKey: "test" }), {

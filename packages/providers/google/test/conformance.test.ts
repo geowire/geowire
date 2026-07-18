@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { runConformanceTests, jsonFetch, statusFetch, createTestContext } from "@geowire/provider-testkit";
-import { GeoProviderError } from "@geowire/provider-sdk";
+import { runConformanceTests, jsonFetch, statusFetch, createTestContext } from "@geowirehq/provider-testkit";
+import { GeoProviderError } from "@geowirehq/provider-sdk";
 import { createGoogleProvider } from "../src/index.js";
 
 const searchBody = {

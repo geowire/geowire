@@ -22,13 +22,13 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@geowire/core": "workspace:*",
-    "@geowire/schema": "workspace:*",
-    "@geowire/provider-sdk": "workspace:*",
-    "@geowire/provider-nominatim": "workspace:*",
-    "@geowire/provider-google": "workspace:*",
-    "@geowire/provider-internal": "workspace:*",
-    "@geowire/server": "workspace:*"
+    "@geowirehq/core": "workspace:*",
+    "@geowirehq/schema": "workspace:*",
+    "@geowirehq/provider-sdk": "workspace:*",
+    "@geowirehq/provider-nominatim": "workspace:*",
+    "@geowirehq/provider-google": "workspace:*",
+    "@geowirehq/provider-internal": "workspace:*",
+    "@geowirehq/server": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

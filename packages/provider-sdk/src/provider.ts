@@ -6,7 +6,7 @@ import type {
   ReverseGeocodeRequest,
   GetPlaceRequest,
   AutocompleteRequest,
-} from "@geowire/schema";
+} from "@geowirehq/schema";
 import type { ProviderContext } from "./context.js";
 import type { ProviderHealth, ProviderPlace } from "./types.js";
 

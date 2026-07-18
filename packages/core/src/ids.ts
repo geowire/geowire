@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { PLACE_ID_PREFIX } from "@geowire/schema";
+import { PLACE_ID_PREFIX } from "@geowirehq/schema";
 
 /** 해시에서 취할 base64url 문자 수 (충돌 여유 충분, ID 길이 절제) */
 const HASH_LENGTH = 20;

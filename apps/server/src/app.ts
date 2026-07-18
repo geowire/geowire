@@ -1,7 +1,7 @@
 import Fastify, { type FastifyInstance } from "fastify";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
-import type { GeoWire } from "@geowire/core";
+import type { GeoWire } from "@geowirehq/core";
 import { registerRoutes } from "./routes.js";
 import { createMetrics } from "./metrics.js";
 import { registerAuth } from "./auth.js";

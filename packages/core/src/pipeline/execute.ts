@@ -6,7 +6,7 @@ import {
   type Logger,
   type Clock,
   type FetchFn,
-} from "@geowire/provider-sdk";
+} from "@geowirehq/provider-sdk";
 import type { RegisteredProvider, ProviderRegistry } from "../registry.js";
 import type { CircuitBreaker } from "../circuit-breaker.js";
 import type { ListRequest, OperationPlan, OperationSpec, ProviderInvocation } from "./types.js";

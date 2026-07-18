@@ -1,13 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { ProviderManifest, type Capability } from "@geowire/schema";
-import type { ProviderErrorCode } from "@geowire/schema";
+import { ProviderManifest, type Capability } from "@geowirehq/schema";
+import type { ProviderErrorCode } from "@geowirehq/schema";
 import {
   GeoProviderError,
   ProviderPlace,
   CAPABILITY_METHOD,
   type GeoProvider,
   type ProviderContext,
-} from "@geowire/provider-sdk";
+} from "@geowirehq/provider-sdk";
 import { jsonFetch, statusFetch, hangingFetch, createTestContext } from "./mock-server.js";
 
 /** capability 하나에 대한 성공 시나리오 픽스처 */

@@ -1,5 +1,5 @@
-import type { ProviderPlace } from "@geowire/provider-sdk";
-import type { LatLng, Place, PlaceSource } from "@geowire/schema";
+import type { ProviderPlace } from "@geowirehq/provider-sdk";
+import type { LatLng, Place, PlaceSource } from "@geowirehq/schema";
 import { makePlaceId } from "../ids.js";
 import { haversineMeters } from "../geo.js";
 

@@ -34,7 +34,7 @@ Add this to your MCP client config (e.g. Claude Desktop `claude_desktop_config.j
 ```json
 {
   "mcpServers": {
-    "geowire": { "command": "npx", "args": ["-y", "@geowire/mcp"] }
+    "geowire": { "command": "npx", "args": ["-y", "@geowirehq/mcp"] }
   }
 }
 ```
@@ -67,8 +67,8 @@ Or with `docker compose up` (see `docker-compose.yml`). API docs at `/docs`.
 ### 4. SDK (embedded)
 
 ```ts
-import { createGeoWire } from "@geowire/core";
-import { createNominatimProvider } from "@geowire/provider-nominatim";
+import { createGeoWire } from "@geowirehq/core";
+import { createNominatimProvider } from "@geowirehq/provider-nominatim";
 
 const geo = createGeoWire({ providers: [createNominatimProvider()] });
 const { results, meta } = await geo.searchPlaces({
@@ -127,9 +127,9 @@ Keys come from the environment (`${VAR}`), never committed in plaintext.
 
 | Provider | Key? | Capabilities |
 |---|---|---|
-| `@geowire/provider-nominatim` (OpenStreetMap) | none | search, geocode, reverseGeocode |
-| `@geowire/provider-google` (Maps Platform) | BYOK | search, geocode, reverseGeocode, getPlace |
-| `@geowire/provider-internal` (your CSV) | none | search |
+| `@geowirehq/provider-nominatim` (OpenStreetMap) | none | search, geocode, reverseGeocode |
+| `@geowirehq/provider-google` (Maps Platform) | BYOK | search, geocode, reverseGeocode, getPlace |
+| `@geowirehq/provider-internal` (your CSV) | none | search |
 
 Want another provider? See [CONTRIBUTING.md](./CONTRIBUTING.md) —
 *"Write a provider in 30 minutes"*.

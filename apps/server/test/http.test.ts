@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { createGeoWire, type GeoWire } from "@geowire/core";
-import { createNominatimProvider } from "@geowire/provider-nominatim";
-import { createGoogleProvider } from "@geowire/provider-google";
+import { createGeoWire, type GeoWire } from "@geowirehq/core";
+import { createNominatimProvider } from "@geowirehq/provider-nominatim";
+import { createGoogleProvider } from "@geowirehq/provider-google";
 import type { FastifyInstance } from "fastify";
 import { buildServer } from "../src/app.js";
 

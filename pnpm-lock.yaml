@@ -23,25 +23,25 @@ importers:
       '@fastify/swagger-ui':
         specifier: ^6.1.0
         version: 6.1.0
-      '@geowire/core':
+      '@geowirehq/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@geowire/mcp':
+      '@geowirehq/mcp':
         specifier: workspace:*
         version: link:../../packages/mcp
-      '@geowire/provider-google':
+      '@geowirehq/provider-google':
         specifier: workspace:*
         version: link:../../packages/providers/google
-      '@geowire/provider-internal':
+      '@geowirehq/provider-internal':
         specifier: workspace:*
         version: link:../../packages/providers/internal
-      '@geowire/provider-nominatim':
+      '@geowirehq/provider-nominatim':
         specifier: workspace:*
         version: link:../../packages/providers/nominatim
-      '@geowire/provider-sdk':
+      '@geowirehq/provider-sdk':
         specifier: workspace:*
         version: link:../../packages/provider-sdk
-      '@geowire/schema':
+      '@geowirehq/schema':
         specifier: workspace:*
         version: link:../../packages/schema
       '@modelcontextprotocol/sdk':
@@ -69,25 +69,25 @@ importers:
 
   packages/cli:
     dependencies:
-      '@geowire/core':
+      '@geowirehq/core':
         specifier: workspace:*
         version: link:../core
-      '@geowire/provider-google':
+      '@geowirehq/provider-google':
         specifier: workspace:*
         version: link:../providers/google
-      '@geowire/provider-internal':
+      '@geowirehq/provider-internal':
         specifier: workspace:*
         version: link:../providers/internal
-      '@geowire/provider-nominatim':
+      '@geowirehq/provider-nominatim':
         specifier: workspace:*
         version: link:../providers/nominatim
-      '@geowire/provider-sdk':
+      '@geowirehq/provider-sdk':
         specifier: workspace:*
         version: link:../provider-sdk
-      '@geowire/schema':
+      '@geowirehq/schema':
         specifier: workspace:*
         version: link:../schema
-      '@geowire/server':
+      '@geowirehq/server':
         specifier: workspace:*
         version: link:../../apps/server
     devDependencies:
@@ -103,10 +103,10 @@ importers:
 
   packages/core:
     dependencies:
-      '@geowire/provider-sdk':
+      '@geowirehq/provider-sdk':
         specifier: workspace:*
         version: link:../provider-sdk
-      '@geowire/schema':
+      '@geowirehq/schema':
         specifier: workspace:*
         version: link:../schema
       yaml:
@@ -116,13 +116,13 @@ importers:
         specifier: ^4.0.0
         version: 4.4.3
     devDependencies:
-      '@geowire/provider-google':
+      '@geowirehq/provider-google':
         specifier: workspace:*
         version: link:../providers/google
-      '@geowire/provider-internal':
+      '@geowirehq/provider-internal':
         specifier: workspace:*
         version: link:../providers/internal
-      '@geowire/provider-nominatim':
+      '@geowirehq/provider-nominatim':
         specifier: workspace:*
         version: link:../providers/nominatim
       '@types/node':
@@ -137,22 +137,22 @@ importers:
 
   packages/mcp:
     dependencies:
-      '@geowire/core':
+      '@geowirehq/core':
         specifier: workspace:*
         version: link:../core
-      '@geowire/provider-google':
+      '@geowirehq/provider-google':
         specifier: workspace:*
         version: link:../providers/google
-      '@geowire/provider-internal':
+      '@geowirehq/provider-internal':
         specifier: workspace:*
         version: link:../providers/internal
-      '@geowire/provider-nominatim':
+      '@geowirehq/provider-nominatim':
         specifier: workspace:*
         version: link:../providers/nominatim
-      '@geowire/provider-sdk':
+      '@geowirehq/provider-sdk':
         specifier: workspace:*
         version: link:../provider-sdk
-      '@geowire/schema':
+      '@geowirehq/schema':
         specifier: workspace:*
         version: link:../schema
       '@modelcontextprotocol/sdk':
@@ -174,7 +174,7 @@ importers:
 
   packages/provider-sdk:
     dependencies:
-      '@geowire/schema':
+      '@geowirehq/schema':
         specifier: workspace:*
         version: link:../schema
       zod:
@@ -193,10 +193,10 @@ importers:
 
   packages/provider-testkit:
     dependencies:
-      '@geowire/provider-sdk':
+      '@geowirehq/provider-sdk':
         specifier: workspace:*
         version: link:../provider-sdk
-      '@geowire/schema':
+      '@geowirehq/schema':
         specifier: workspace:*
         version: link:../schema
     devDependencies:
@@ -212,14 +212,14 @@ importers:
 
   packages/providers/google:
     dependencies:
-      '@geowire/provider-sdk':
+      '@geowirehq/provider-sdk':
         specifier: workspace:*
         version: link:../../provider-sdk
-      '@geowire/schema':
+      '@geowirehq/schema':
         specifier: workspace:*
         version: link:../../schema
     devDependencies:
-      '@geowire/provider-testkit':
+      '@geowirehq/provider-testkit':
         specifier: workspace:*
         version: link:../../provider-testkit
       '@types/node':
@@ -234,14 +234,14 @@ importers:
 
   packages/providers/internal:
     dependencies:
-      '@geowire/provider-sdk':
+      '@geowirehq/provider-sdk':
         specifier: workspace:*
         version: link:../../provider-sdk
-      '@geowire/schema':
+      '@geowirehq/schema':
         specifier: workspace:*
         version: link:../../schema
     devDependencies:
-      '@geowire/provider-testkit':
+      '@geowirehq/provider-testkit':
         specifier: workspace:*
         version: link:../../provider-testkit
       '@types/node':
@@ -256,14 +256,14 @@ importers:
 
   packages/providers/nominatim:
     dependencies:
-      '@geowire/provider-sdk':
+      '@geowirehq/provider-sdk':
         specifier: workspace:*
         version: link:../../provider-sdk
-      '@geowire/schema':
+      '@geowirehq/schema':
         specifier: workspace:*
         version: link:../../schema
     devDependencies:
-      '@geowire/provider-testkit':
+      '@geowirehq/provider-testkit':
         specifier: workspace:*
         version: link:../../provider-testkit
       '@types/node':

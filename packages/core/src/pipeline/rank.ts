@@ -1,4 +1,4 @@
-import type { LatLng, Place } from "@geowire/schema";
+import type { LatLng, Place } from "@geowirehq/schema";
 import type { RankWeights } from "../config/schema.js";
 
 export interface RankOptions {

@@ -41,6 +41,6 @@ def search_places(query: str) -> list[dict]:
 
 ## Or connect over MCP
 
-GeoWire is also an MCP server (`npx @geowire/mcp` for stdio, or `POST /mcp` for
+GeoWire is also an MCP server (`npx @geowirehq/mcp` for stdio, or `POST /mcp` for
 HTTP). Use any MCP client adapter (e.g. `langchain-mcp-adapters`) to load its 5
 tools directly.

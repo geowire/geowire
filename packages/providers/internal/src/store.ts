@@ -1,5 +1,5 @@
-import type { LatLng, SearchPlacesRequest } from "@geowire/schema";
-import type { ProviderPlace } from "@geowire/provider-sdk";
+import type { LatLng, SearchPlacesRequest } from "@geowirehq/schema";
+import type { ProviderPlace } from "@geowirehq/provider-sdk";
 
 const EARTH_RADIUS_M = 6_371_000;
 const toRad = (d: number): number => (d * Math.PI) / 180;

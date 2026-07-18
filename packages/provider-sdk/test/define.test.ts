@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { defineProvider } from "../src/index.js";
-import type { ProviderManifest } from "@geowire/schema";
+import type { ProviderManifest } from "@geowirehq/schema";
 
 const manifest: ProviderManifest = {
   id: "mock",

@@ -9,20 +9,20 @@
 ## 0. 현재 상태 (Phase 0~9 완료 ✅ · Docker 검증됨 · 외부 런칭 작업만 잔여)
 
 - [x] 모노레포 스캐폴딩 (pnpm + Turborepo + TS strict/ESM)
-- [x] `@geowire/schema` — Place / PlaceSource / ProviderManifest / 요청·응답 / CountryCode 스키마 (Zod v4, 테스트 23개 통과)
-- [x] `@geowire/provider-sdk` — GeoProvider / ProviderContext(재시도·타임아웃 fetch) / GeoProviderError / defineProvider (테스트 21개 통과)
-- [x] `@geowire/provider-testkit` — runConformanceChecks/Tests(6축) + mock-server + 픽스처 로더/레코더 (테스트 7개 통과)
-- [x] `@geowire/provider-nominatim` — search/geocode/reverse, 카테고리 맵, 1req/s rate limit·UA 강제, baseUrl 교체 (테스트 11개 통과)
-- [x] `@geowire/core` — config(zero-config)·registry·pipeline·first-success·merge·dedup v1·rank·cache(LRU)·policy·cost·circuit-breaker·**getPlace**·createGeoWire 퍼사드 (테스트 94개, 3-공급자 E2E 포함)
-- [x] `@geowire/provider-google` — BYOK, Places API(New) search/getPlace + Geocoding geocode/reverse, 카테고리 맵, cost.perCall 공식단가, 키 없으면 MISSING_CREDENTIALS (테스트 7개 통과)
-- [x] `@geowire/provider-internal` — CSV 로더(RFC4180, 컬럼 별칭), 인메모리 이름 부분일치 + Haversine 반경 검색, priority 100 권장 (테스트 9개 통과)
-- [x] `@geowire/mcp` — 도구 5종(search_places/get_place/geocode_address/reverse_geocode/list_geo_providers), inputSchema z.toJSONSchema 자동생성, 요약텍스트+structuredContent, stdio bin(geowire-mcp), 자가수정 에러 (테스트 12개 통과, InMemoryTransport E2E + stdio 스모크)
-- [x] `@geowire/server` (apps/server) — Fastify REST(/v1 검색·상세·지오코딩·providers·health), OpenAPI 3.1 자동생성+/docs, prom-client /metrics, 선택적 Bearer 인증, MCP Streamable HTTP /mcp 마운트 (테스트 14개 통과, 실서버 curl 스모크)
+- [x] `@geowirehq/schema` — Place / PlaceSource / ProviderManifest / 요청·응답 / CountryCode 스키마 (Zod v4, 테스트 23개 통과)
+- [x] `@geowirehq/provider-sdk` — GeoProvider / ProviderContext(재시도·타임아웃 fetch) / GeoProviderError / defineProvider (테스트 21개 통과)
+- [x] `@geowirehq/provider-testkit` — runConformanceChecks/Tests(6축) + mock-server + 픽스처 로더/레코더 (테스트 7개 통과)
+- [x] `@geowirehq/provider-nominatim` — search/geocode/reverse, 카테고리 맵, 1req/s rate limit·UA 강제, baseUrl 교체 (테스트 11개 통과)
+- [x] `@geowirehq/core` — config(zero-config)·registry·pipeline·first-success·merge·dedup v1·rank·cache(LRU)·policy·cost·circuit-breaker·**getPlace**·createGeoWire 퍼사드 (테스트 94개, 3-공급자 E2E 포함)
+- [x] `@geowirehq/provider-google` — BYOK, Places API(New) search/getPlace + Geocoding geocode/reverse, 카테고리 맵, cost.perCall 공식단가, 키 없으면 MISSING_CREDENTIALS (테스트 7개 통과)
+- [x] `@geowirehq/provider-internal` — CSV 로더(RFC4180, 컬럼 별칭), 인메모리 이름 부분일치 + Haversine 반경 검색, priority 100 권장 (테스트 9개 통과)
+- [x] `@geowirehq/mcp` — 도구 5종(search_places/get_place/geocode_address/reverse_geocode/list_geo_providers), inputSchema z.toJSONSchema 자동생성, 요약텍스트+structuredContent, stdio bin(geowire-mcp), 자가수정 에러 (테스트 12개 통과, InMemoryTransport E2E + stdio 스모크)
+- [x] `@geowirehq/server` (apps/server) — Fastify REST(/v1 검색·상세·지오코딩·providers·health), OpenAPI 3.1 자동생성+/docs, prom-client /metrics, 선택적 Bearer 인증, MCP Streamable HTTP /mcp 마운트 (테스트 14개 통과, 실서버 curl 스모크)
 - [x] `geowire` (packages/cli) — `serve`(기본, 서버 기동)·`search`(원샷 테이블/JSON)·`test`(연결 검사)·`init`(대화형 마법사→.env+config+.gitignore)·help/version, 경량 argv 파서, .env 로더 (테스트 18개 통과, serve 실기동 스모크)
 - [x] 배포·문서 산출물 — CI(ci.yml/release.yml, node22 ubuntu·windows 매트릭스 + conformance job), Changesets, 멀티스테이지 Dockerfile+compose, README 완성, CONTRIBUTING("provider in 30 min"), Issue 템플릿 3종, examples 6종
 - [x] git 초기화 + baseline 커밋, Apache-2.0, README 스켈레톤
 - [ ] **(사용자 작업)** GitHub org·npm publish·데모 GIF·MCP 디렉터리 등록·Show HN (외부 계정/수동)
-- [ ] **(사용자 작업)** GitHub org `geowire` 생성, npm `@geowire` 스코프 확보, geowire.dev 구매
+- [ ] **(사용자 작업)** GitHub org `geowire` 생성, npm `@geowirehq` 스코프 확보(`@geowire`는 선점됨), geowire.dev 구매
 
 ---
 
@@ -81,7 +81,7 @@ packages/provider-sdk/src/
   → 어댑터 200줄 유지 목표.
 - **`GeoProviderError`**: `code: ProviderErrorCode` 필수. HTTP 상태 → 코드 매핑
   유틸(`errorFromHttpStatus(401→AUTH_FAILED, 429→RATE_LIMITED, ...)`)을 제공.
-- `defineProvider()`: manifest를 `@geowire/schema`로 즉시 검증 +
+- `defineProvider()`: manifest를 `@geowirehq/schema`로 즉시 검증 +
   capability와 구현 메서드 일치 검사(capability에 "search"가 있는데
   `searchPlaces` 미구현이면 생성 시점 에러).
 
@@ -216,11 +216,11 @@ DoD:
 
 - 도구 5종: `search_places` `get_place` `geocode_address` `reverse_geocode`
   `list_geo_providers`
-- inputSchema는 `@geowire/schema` Zod → JSON Schema 변환으로 자동 생성 (수기 금지)
+- inputSchema는 `@geowirehq/schema` Zod → JSON Schema 변환으로 자동 생성 (수기 금지)
 - **도구 설명문 = 제품**: LLM이 올바르게 선택·호출하도록 설명·예시를 신중히 작성,
   프롬프트 회귀 테스트(도구 선택 시나리오 스냅샷)
 - 응답: 사람이 읽는 요약 텍스트 + `structuredContent`(스키마 준수 JSON) 병행
-- 전송: stdio (`bin: geowire-mcp`, `npx -y @geowire/mcp`로 즉시 실행)
+- 전송: stdio (`bin: geowire-mcp`, `npx -y @geowirehq/mcp`로 즉시 실행)
 - 에러: LLM이 자가 수정 가능한 메시지 ("query is required. Example: ...")
 
 DoD:
@@ -331,7 +331,7 @@ DoD:
 - 모든 공개 API에 JSDoc (docs 사이트 자동 추출 대비)
 - 로깅: `pino` 인터페이스로 통일, provider에는 context.logger만 노출
 - 에러: core 외부로 나가는 에러는 전부 정규화된 코드 보유
-- 버전: Changesets, `@geowire/*` 패키지 간 workspace 프로토콜
+- 버전: Changesets, `@geowirehq/*` 패키지 간 workspace 프로토콜
 - 테스트 계층: 단위(각 패키지) → conformance(provider) → 통합(fake provider) →
   E2E(HTTP inject / MCP Inspector). **실외부호출은 CI에서 금지** (픽스처만)
 - 커밋: Conventional Commits (`feat(core): ...`) — 릴리스 노트 자동화 대비

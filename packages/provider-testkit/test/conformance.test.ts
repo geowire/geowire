@@ -5,7 +5,7 @@ import {
   defineProvider,
   errorFromHttpStatus,
   type GeoProvider,
-} from "@geowire/provider-sdk";
+} from "@geowirehq/provider-sdk";
 import {
   runConformanceChecks,
   runConformanceTests,

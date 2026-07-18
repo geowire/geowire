@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { createNominatimProvider } from "@geowire/provider-nominatim";
+import { createNominatimProvider } from "@geowirehq/provider-nominatim";
 import { createGeoWire } from "../src/geowire.js";
-import { SearchPlacesResponse } from "@geowire/schema";
+import { SearchPlacesResponse } from "@geowirehq/schema";
 
 /** 호치민 약국 검색에 대한 Nominatim jsonv2 응답 픽스처 (실호출 없이 E2E) */
 const HCMC_PHARMACIES = [

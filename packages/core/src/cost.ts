@@ -1,4 +1,4 @@
-import type { Capability } from "@geowire/schema";
+import type { Capability } from "@geowirehq/schema";
 import type { ProviderRegistry } from "./registry.js";
 import type { BudgetConfig } from "./config/schema.js";
 

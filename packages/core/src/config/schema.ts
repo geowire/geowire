@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CountryCode, Strategy } from "@geowire/schema";
+import { CountryCode, Strategy } from "@geowirehq/schema";
 
 /**
  * 개별 공급자 설정 (설계 §8.1).

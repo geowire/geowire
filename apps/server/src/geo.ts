@@ -1,8 +1,8 @@
-import { createGeoWire, loadConfig, type GeoWire } from "@geowire/core";
-import type { GeoProvider, Logger } from "@geowire/provider-sdk";
-import { createNominatimProvider } from "@geowire/provider-nominatim";
-import { createGoogleProvider } from "@geowire/provider-google";
-import { createInternalProvider } from "@geowire/provider-internal";
+import { createGeoWire, loadConfig, type GeoWire } from "@geowirehq/core";
+import type { GeoProvider, Logger } from "@geowirehq/provider-sdk";
+import { createNominatimProvider } from "@geowirehq/provider-nominatim";
+import { createGoogleProvider } from "@geowirehq/provider-google";
+import { createInternalProvider } from "@geowirehq/provider-internal";
 
 /**
  * 환경 변수로 GeoWire 인스턴스를 구성한다 (설계 §8.1 Zero-config + BYOK).

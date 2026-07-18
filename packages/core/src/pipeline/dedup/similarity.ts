@@ -1,4 +1,4 @@
-import type { Place } from "@geowire/schema";
+import type { Place } from "@geowirehq/schema";
 import { haversineMeters } from "../../geo.js";
 
 /** 라틴 법인 접미사 — 단어 경계(\b) 기준으로 제거 ("co"가 "company"를 오탐하지 않도록) */

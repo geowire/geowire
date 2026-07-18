@@ -1,4 +1,4 @@
-import type { GeoWire } from "@geowire/core";
+import type { GeoWire } from "@geowirehq/core";
 import type { IO } from "../io.js";
 
 /**

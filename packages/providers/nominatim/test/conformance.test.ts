@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { runConformanceTests, jsonFetch, createTestContext } from "@geowire/provider-testkit";
+import { runConformanceTests, jsonFetch, createTestContext } from "@geowirehq/provider-testkit";
 import { createNominatimProvider } from "../src/index.js";
 
 const searchBody = [

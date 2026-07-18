@@ -1,4 +1,4 @@
-import { ProviderManifest } from "@geowire/schema";
+import { ProviderManifest } from "@geowirehq/schema";
 import { CAPABILITY_METHOD, type GeoProvider } from "./provider.js";
 
 /**

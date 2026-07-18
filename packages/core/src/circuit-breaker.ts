@@ -1,5 +1,5 @@
-import type { Clock } from "@geowire/provider-sdk";
-import type { ProviderErrorCode } from "@geowire/schema";
+import type { Clock } from "@geowirehq/provider-sdk";
+import type { ProviderErrorCode } from "@geowirehq/schema";
 
 export interface CircuitBreakerOptions {
   /** 연속 실패 임계값 — 도달 시 회로 open. 기본 5 */

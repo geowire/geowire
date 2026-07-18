@@ -1,4 +1,4 @@
-import type { Place, ResponseMeta } from "@geowire/schema";
+import type { Place, ResponseMeta } from "@geowirehq/schema";
 
 /** 문자열을 최대 길이로 자르고 말줄임표 */
 function truncate(text: string, max: number): string {

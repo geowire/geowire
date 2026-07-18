@@ -3,7 +3,7 @@ import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import type { GeoWire } from "@geowire/core";
+import type { GeoWire } from "@geowirehq/core";
 import { TOOL_DEFS, dispatchTool } from "./tools.js";
 
 /**

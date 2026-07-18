@@ -3,7 +3,7 @@ import {
   noopLogger,
   type FetchFn,
   type ProviderContext,
-} from "@geowire/provider-sdk";
+} from "@geowirehq/provider-sdk";
 
 /** JSON 응답 Response를 만든다 (content-type 자동) */
 export function mockJson(body: unknown, init: ResponseInit = {}): Response {

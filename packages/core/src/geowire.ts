@@ -1,6 +1,6 @@
-import type { GeoProvider, Logger, Clock, FetchFn } from "@geowire/provider-sdk";
-import { noopLogger } from "@geowire/provider-sdk";
-import type { Capability } from "@geowire/schema";
+import type { GeoProvider, Logger, Clock, FetchFn } from "@geowirehq/provider-sdk";
+import { noopLogger } from "@geowirehq/provider-sdk";
+import type { Capability } from "@geowirehq/schema";
 import {
   SearchPlacesRequest,
   GeocodeRequest,
@@ -8,7 +8,7 @@ import {
   GetPlaceRequest,
   SearchPlacesResponse,
   Place,
-} from "@geowire/schema";
+} from "@geowirehq/schema";
 import { GeoWireConfig, defaultConfig } from "./config/schema.js";
 import { normalizeConfig } from "./config/load.js";
 import { collectConfigWarnings } from "./config/warnings.js";

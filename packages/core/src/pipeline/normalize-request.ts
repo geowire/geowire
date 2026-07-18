@@ -1,4 +1,4 @@
-import type { CountryCode, LatLng, RequestOptions, Strategy } from "@geowire/schema";
+import type { CountryCode, LatLng, RequestOptions, Strategy } from "@geowirehq/schema";
 import type { GeoWireConfig } from "../config/schema.js";
 
 /**

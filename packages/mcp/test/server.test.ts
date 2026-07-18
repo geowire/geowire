@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { createGeoWire, type GeoWire } from "@geowire/core";
-import { createNominatimProvider } from "@geowire/provider-nominatim";
-import { createGoogleProvider } from "@geowire/provider-google";
+import { createGeoWire, type GeoWire } from "@geowirehq/core";
+import { createNominatimProvider } from "@geowirehq/provider-nominatim";
+import { createGoogleProvider } from "@geowirehq/provider-google";
 import { createGeoWireMcpServer } from "../src/server.js";
 import { TOOL_DEFS } from "../src/tools.js";
 

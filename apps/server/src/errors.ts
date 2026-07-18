@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GeoProviderError } from "@geowire/provider-sdk";
+import { GeoProviderError } from "@geowirehq/provider-sdk";
 import type { FastifyError, FastifyReply, FastifyRequest } from "fastify";
 
 /** 정규화된 오류 응답 봉투 */

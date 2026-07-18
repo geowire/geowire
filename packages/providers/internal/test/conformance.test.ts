@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { runConformanceTests, createTestContext, jsonFetch } from "@geowire/provider-testkit";
+import { runConformanceTests, createTestContext, jsonFetch } from "@geowirehq/provider-testkit";
 import { createInternalProvider } from "../src/index.js";
 import { parseCsvRecords } from "../src/csv.js";
 import { StoreIndex } from "../src/store.js";

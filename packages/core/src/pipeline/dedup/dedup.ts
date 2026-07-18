@@ -1,4 +1,4 @@
-import type { Place } from "@geowire/schema";
+import type { Place } from "@geowirehq/schema";
 import { pairScore } from "./similarity.js";
 import { mergeCluster, type MergeContext } from "./merge-fields.js";
 

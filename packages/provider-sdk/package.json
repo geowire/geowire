@@ -1,5 +1,5 @@
 {
-  "name": "@geowire/provider-sdk",
+  "name": "@geowirehq/provider-sdk",
   "version": "0.1.0",
   "description": "GeoWire provider contract — the interface every geo provider implements",
   "license": "Apache-2.0",
@@ -19,7 +19,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@geowire/schema": "workspace:*",
+    "@geowirehq/schema": "workspace:*",
     "zod": "^4.0.0"
   },
   "devDependencies": {

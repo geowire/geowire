@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ProviderPlace } from "@geowire/provider-sdk";
+import { ProviderPlace } from "@geowirehq/provider-sdk";
 import { parseResult, parseResults, mapCategory } from "../src/index.js";
 
 const hcmPharmacy = {

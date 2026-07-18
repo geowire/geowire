@@ -1,7 +1,7 @@
-import { defineProvider, GeoProviderError } from "@geowire/provider-sdk";
-import type { GeoProvider, ProviderContext } from "@geowire/provider-sdk";
-import type { ProviderManifest, ProviderErrorCode } from "@geowire/schema";
-import type { ProviderPlace } from "@geowire/provider-sdk";
+import { defineProvider, GeoProviderError } from "@geowirehq/provider-sdk";
+import type { GeoProvider, ProviderContext } from "@geowirehq/provider-sdk";
+import type { ProviderManifest, ProviderErrorCode } from "@geowirehq/schema";
+import type { ProviderPlace } from "@geowirehq/provider-sdk";
 
 /** 테스트용 최소 ProviderContext */
 export function testContext(overrides: Partial<ProviderContext> = {}): ProviderContext {
@@ -100,20 +100,20 @@ export function builtPlace(args: {
   name: string;
   location?: { latitude: number; longitude: number };
   categories?: string[];
-  address?: import("@geowire/schema").Address;
-  contact?: import("@geowire/schema").Contact;
-  business?: import("@geowire/schema").Business;
+  address?: import("@geowirehq/schema").Address;
+  contact?: import("@geowirehq/schema").Contact;
+  business?: import("@geowirehq/schema").Business;
   confidence?: number;
   distanceMeters?: number;
   fetchedAt?: string;
-}): import("@geowire/schema").Place {
-  const source: import("@geowire/schema").PlaceSource = {
+}): import("@geowirehq/schema").Place {
+  const source: import("@geowirehq/schema").PlaceSource = {
     provider: args.provider,
     providerPlaceId: args.providerPlaceId,
     fetchedAt: args.fetchedAt ?? "2026-07-17T00:00:00.000Z",
   };
   if (args.confidence != null) source.confidence = args.confidence;
-  const p: import("@geowire/schema").Place = {
+  const p: import("@geowirehq/schema").Place = {
     id: `gwp_${args.provider}_${args.providerPlaceId}`,
     name: args.name,
     categories: args.categories ?? [],

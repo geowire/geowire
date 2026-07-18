@@ -1,5 +1,5 @@
-import type { GeoWire } from "@geowire/core";
-import type { LatLng, Strategy } from "@geowire/schema";
+import type { GeoWire } from "@geowirehq/core";
+import type { LatLng, Strategy } from "@geowirehq/schema";
 import type { IO } from "../io.js";
 import { formatSearchTable } from "../format.js";
 

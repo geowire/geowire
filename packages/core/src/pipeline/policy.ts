@@ -1,4 +1,4 @@
-import type { Place } from "@geowire/schema";
+import type { Place } from "@geowirehq/schema";
 import type { ProviderRegistry } from "../registry.js";
 
 export interface PolicyResult {

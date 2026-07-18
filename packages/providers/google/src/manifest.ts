@@ -1,4 +1,4 @@
-import type { ProviderManifest } from "@geowire/schema";
+import type { ProviderManifest } from "@geowirehq/schema";
 
 /**
  * Google Maps Platform 공급자 선언 (BYOK).

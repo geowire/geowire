@@ -1,4 +1,4 @@
-import type { Place, PlaceSource } from "@geowire/schema";
+import type { Place, PlaceSource } from "@geowirehq/schema";
 import { makePlaceId } from "../../ids.js";
 
 /**

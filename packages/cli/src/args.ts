@@ -1,4 +1,4 @@
-import type { LatLng } from "@geowire/schema";
+import type { LatLng } from "@geowirehq/schema";
 
 export interface ParsedArgs {
   /** 위치 인자 (플래그가 아닌 것) */

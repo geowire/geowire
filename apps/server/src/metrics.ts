@@ -1,5 +1,5 @@
 import { Registry, Counter, Histogram, collectDefaultMetrics } from "prom-client";
-import type { ResponseMeta } from "@geowire/schema";
+import type { ResponseMeta } from "@geowirehq/schema";
 
 /**
  * Prometheus 메트릭 (설계 §8.3, §7 /metrics).

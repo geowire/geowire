@@ -1,4 +1,4 @@
-import type { LatLng } from "@geowire/schema";
+import type { LatLng } from "@geowirehq/schema";
 
 const EARTH_RADIUS_M = 6_371_000;
 

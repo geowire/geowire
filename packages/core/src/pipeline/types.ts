@@ -1,4 +1,4 @@
-import type { GeoProviderError, ProviderPlace } from "@geowire/provider-sdk";
+import type { GeoProviderError, ProviderPlace } from "@geowirehq/provider-sdk";
 import type {
   Capability,
   CountryCode,
@@ -9,7 +9,7 @@ import type {
   GeocodeRequest,
   ReverseGeocodeRequest,
   AutocompleteRequest,
-} from "@geowire/schema";
+} from "@geowirehq/schema";
 
 /** ProviderPlace[] 를 반환하는 공급자 메서드 (getPlace 제외 — 단수 반환이라 별도 경로) */
 export type ListMethod = "searchPlaces" | "geocode" | "reverseGeocode" | "autocomplete";

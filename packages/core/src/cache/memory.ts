@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import type { Clock } from "@geowire/provider-sdk";
+import type { Clock } from "@geowirehq/provider-sdk";
 import type { CacheAdapter, CachedResponse } from "./adapter.js";
 
 interface Entry {

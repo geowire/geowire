@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import type { Logger } from "@geowire/provider-sdk";
+import type { Logger } from "@geowirehq/provider-sdk";
 import { buildServer } from "./app.js";
 import { createGeoFromEnv } from "./geo.js";
 

@@ -1,5 +1,5 @@
 {
-  "name": "@geowire/provider-internal",
+  "name": "@geowirehq/provider-internal",
   "version": "0.1.0",
   "description": "GeoWire internal provider — customer's own places from CSV (in-memory search)",
   "license": "Apache-2.0",
@@ -19,11 +19,11 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@geowire/schema": "workspace:*",
-    "@geowire/provider-sdk": "workspace:*"
+    "@geowirehq/schema": "workspace:*",
+    "@geowirehq/provider-sdk": "workspace:*"
   },
   "devDependencies": {
-    "@geowire/provider-testkit": "workspace:*",
+    "@geowirehq/provider-testkit": "workspace:*",
     "@types/node": "^22.0.0",
     "typescript": "^5.8.0",
     "vitest": "^3.2.0"

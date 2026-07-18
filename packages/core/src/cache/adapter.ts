@@ -1,4 +1,4 @@
-import type { Place, ResponseMeta } from "@geowire/schema";
+import type { Place, ResponseMeta } from "@geowirehq/schema";
 
 /** 캐시에 저장되는 응답 스냅샷 (meta.cache는 조회 시점에 덧씌운다) */
 export interface CachedResponse {

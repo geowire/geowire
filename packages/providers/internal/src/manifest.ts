@@ -1,4 +1,4 @@
-import type { ProviderManifest } from "@geowire/schema";
+import type { ProviderManifest } from "@geowirehq/schema";
 
 /**
  * 고객 자체 데이터 공급자 선언.

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-import { createGeoWire, loadConfig } from "@geowire/core";
-import type { GeoProvider, Logger } from "@geowire/provider-sdk";
-import { createNominatimProvider } from "@geowire/provider-nominatim";
-import { createGoogleProvider } from "@geowire/provider-google";
-import { createInternalProvider } from "@geowire/provider-internal";
+import { createGeoWire, loadConfig } from "@geowirehq/core";
+import type { GeoProvider, Logger } from "@geowirehq/provider-sdk";
+import { createNominatimProvider } from "@geowirehq/provider-nominatim";
+import { createGoogleProvider } from "@geowirehq/provider-google";
+import { createInternalProvider } from "@geowirehq/provider-internal";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createGeoWireMcpServer } from "./server.js";
 

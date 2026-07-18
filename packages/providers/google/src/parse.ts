@@ -1,6 +1,6 @@
-import { CountryCode } from "@geowire/schema";
-import type { Address, Business, Contact } from "@geowire/schema";
-import type { ProviderPlace } from "@geowire/provider-sdk";
+import { CountryCode } from "@geowirehq/schema";
+import type { Address, Business, Contact } from "@geowirehq/schema";
+import type { ProviderPlace } from "@geowirehq/provider-sdk";
 import { mapGoogleTypes } from "./category-map.js";
 
 /** Places API (New) place 리소스의 관심 필드 (전부 선택적, 방어적 파싱) */

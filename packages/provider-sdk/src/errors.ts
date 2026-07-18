@@ -1,4 +1,4 @@
-import type { ProviderErrorCode } from "@geowire/schema";
+import type { ProviderErrorCode } from "@geowirehq/schema";
 
 /**
  * core 바깥으로 나가는 모든 공급자 예외의 정규화 표현.
@@ -6,7 +6,7 @@ import type { ProviderErrorCode } from "@geowire/schema";
  * provider 어댑터는 raw 예외를 반드시 이 타입으로 변환해서 던진다 (설계 §6.3).
  */
 export class GeoProviderError extends Error {
-  /** 정규화된 실패 분류 (`@geowire/schema`의 ProviderErrorCode) */
+  /** 정규화된 실패 분류 (`@geowirehq/schema`의 ProviderErrorCode) */
   readonly code: ProviderErrorCode;
   /** 실패한 공급자 슬러그. core가 채워 넣기도 한다 */
   readonly provider?: string;

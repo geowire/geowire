@@ -3,12 +3,12 @@ import {
   errorFromHttpStatus,
   type GeoProvider,
   type ProviderContext,
-} from "@geowire/provider-sdk";
+} from "@geowirehq/provider-sdk";
 import type {
   SearchPlacesRequest,
   GeocodeRequest,
   ReverseGeocodeRequest,
-} from "@geowire/schema";
+} from "@geowirehq/schema";
 import { NOMINATIM_MANIFEST } from "./manifest.js";
 import { RateLimiter } from "./rate-limit.js";
 import { parseResults } from "./parse.js";

@@ -1,5 +1,5 @@
-import type { Place, ResponseMeta } from "@geowire/schema";
-import type { ProviderInfo } from "@geowire/core";
+import type { Place, ResponseMeta } from "@geowirehq/schema";
+import type { ProviderInfo } from "@geowirehq/core";
 
 /** 좌표를 소수점 5자리로 (약 1m 정밀도) */
 function coord(n: number): string {

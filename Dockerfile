@@ -18,7 +18,7 @@ RUN pnpm build
 
 # server 패키지 + prod 의존성(workspace 포함)을 /app에 실복사 번들로 추출
 # --legacy: pnpm v10에서 non-injected 워크스페이스를 배포하려면 필요
-RUN pnpm --filter @geowire/server deploy --prod --legacy /app
+RUN pnpm --filter @geowirehq/server deploy --prod --legacy /app
 
 # ── runner: distroless nodejs (shell 없음, 경량·비루트) ──
 FROM gcr.io/distroless/nodejs22-debian12 AS runner

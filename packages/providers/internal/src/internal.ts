@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
-import { defineProvider, type GeoProvider } from "@geowire/provider-sdk";
-import type { SearchPlacesRequest } from "@geowire/schema";
+import { defineProvider, type GeoProvider } from "@geowirehq/provider-sdk";
+import type { SearchPlacesRequest } from "@geowirehq/schema";
 import { INTERNAL_MANIFEST } from "./manifest.js";
 import { parseCsvRecords } from "./csv.js";
 import { StoreIndex } from "./store.js";

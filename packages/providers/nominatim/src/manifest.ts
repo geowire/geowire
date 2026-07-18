@@ -1,4 +1,4 @@
-import type { ProviderManifest } from "@geowire/schema";
+import type { ProviderManifest } from "@geowirehq/schema";
 
 /**
  * Nominatim/OSM 공급자 선언. coverage 생략 = 글로벌.

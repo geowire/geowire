@@ -1,8 +1,8 @@
 import { createInterface } from "node:readline/promises";
 import { resolve } from "node:path";
-import type { Logger } from "@geowire/provider-sdk";
-import type { Strategy } from "@geowire/schema";
-import { createGeoFromEnv } from "@geowire/server";
+import type { Logger } from "@geowirehq/provider-sdk";
+import type { Strategy } from "@geowirehq/schema";
+import { createGeoFromEnv } from "@geowirehq/server";
 import { consoleIO, type IO } from "./io.js";
 import { loadDotEnv } from "./env.js";
 import { parseFlags, parseNear, flagInt } from "./args.js";

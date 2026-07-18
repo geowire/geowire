@@ -1,6 +1,6 @@
-import type { GeoProvider } from "@geowire/provider-sdk";
-import type { Capability } from "@geowire/schema";
-import { CAPABILITY_METHOD } from "@geowire/provider-sdk";
+import type { GeoProvider } from "@geowirehq/provider-sdk";
+import type { Capability } from "@geowirehq/schema";
+import { CAPABILITY_METHOD } from "@geowirehq/provider-sdk";
 import type { GeoWireConfig, ProviderConfig } from "./config/schema.js";
 
 /** 등록된 공급자 + 해석된 설정 (registry가 관리하는 단위) */

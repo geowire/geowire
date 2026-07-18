@@ -1,5 +1,5 @@
 {
-  "name": "@geowire/provider-testkit",
+  "name": "@geowirehq/provider-testkit",
   "version": "0.1.0",
   "description": "GeoWire provider conformance kit — \"testkit 통과 = 머지 가능\"",
   "license": "Apache-2.0",
@@ -19,8 +19,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@geowire/schema": "workspace:*",
-    "@geowire/provider-sdk": "workspace:*"
+    "@geowirehq/schema": "workspace:*",
+    "@geowirehq/provider-sdk": "workspace:*"
   },
   "peerDependencies": {
     "vitest": "^3.2.0"

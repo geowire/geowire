@@ -4,9 +4,9 @@ import {
   GeocodeRequest,
   ReverseGeocodeRequest,
   GetPlaceRequest,
-} from "@geowire/schema";
-import type { GeoWire } from "@geowire/core";
-import { GeoProviderError } from "@geowire/provider-sdk";
+} from "@geowirehq/schema";
+import type { GeoWire } from "@geowirehq/core";
+import { GeoProviderError } from "@geowirehq/provider-sdk";
 import type { CallToolResult, Tool } from "@modelcontextprotocol/sdk/types.js";
 import { formatResults, formatSinglePlace, formatProviders } from "./format.js";
 

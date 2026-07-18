@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Place } from "@geowire/schema";
+import { Place } from "@geowirehq/schema";
 
 /**
  * 공급자가 반환하는 정규화된 장소 — `Place`에서 **core의 책임인 필드를 제거**한 형태다.

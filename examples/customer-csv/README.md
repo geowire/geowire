@@ -44,9 +44,9 @@ higher priority.
 ## SDK
 
 ```ts
-import { createGeoWire } from "@geowire/core";
-import { createNominatimProvider } from "@geowire/provider-nominatim";
-import { createInternalProvider } from "@geowire/provider-internal";
+import { createGeoWire } from "@geowirehq/core";
+import { createNominatimProvider } from "@geowirehq/provider-nominatim";
+import { createInternalProvider } from "@geowirehq/provider-internal";
 
 const geo = createGeoWire({
   providers: [

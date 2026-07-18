@@ -4,14 +4,14 @@ import {
   GeoProviderError,
   type GeoProvider,
   type ProviderContext,
-} from "@geowire/provider-sdk";
+} from "@geowirehq/provider-sdk";
 import type {
   SearchPlacesRequest,
   GeocodeRequest,
   ReverseGeocodeRequest,
   GetPlaceRequest,
   ProviderErrorCode,
-} from "@geowire/schema";
+} from "@geowirehq/schema";
 import { GOOGLE_MANIFEST } from "./manifest.js";
 import {
   parseGooglePlace,

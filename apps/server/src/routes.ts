@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { FastifyInstance } from "fastify";
-import type { GeoWire } from "@geowire/core";
-import { SearchPlacesRequest, SearchPlacesResponse, Place } from "@geowire/schema";
+import type { GeoWire } from "@geowirehq/core";
+import { SearchPlacesRequest, SearchPlacesResponse, Place } from "@geowirehq/schema";
 import type { Metrics } from "./metrics.js";
 
 /** Zod → JSON Schema (OpenAPI 문서 전용; 검증은 core의 Zod가 담당). $schema 메타 제거 */

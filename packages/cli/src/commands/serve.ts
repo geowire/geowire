@@ -1,5 +1,5 @@
-import { buildServer } from "@geowire/server";
-import type { GeoWire } from "@geowire/core";
+import { buildServer } from "@geowirehq/server";
+import type { GeoWire } from "@geowirehq/core";
 import type { IO } from "../io.js";
 
 export interface ServeArgs {
