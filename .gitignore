@@ -17,3 +17,7 @@ coverage/
 # editor / OS
 .DS_Store
 Thumbs.db
+.gstack/
+
+# launch ops (local only)
+launch/

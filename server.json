@@ -1,0 +1,42 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.geowire/geowire",
+  "description": "One place-search interface for every AI and map provider (OpenStreetMap, Google, your own data) — provider fallback, multi-provider merge + dedup, cost budgets, policy engine. Works with zero API keys.",
+  "repository": {
+    "url": "https://github.com/geowire/geowire",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "websiteUrl": "https://geowire.dev",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@geowire/mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "GOOGLE_MAPS_API_KEY",
+          "description": "Optional. Enables the Google Maps Platform provider (BYOK). Without it, GeoWire runs OpenStreetMap-only with no key required.",
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "GEOWIRE_INTERNAL_CSV",
+          "description": "Optional. Path to a CSV of your own places to register as a priority provider.",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "GEOWIRE_CONFIG",
+          "description": "Optional. Path to a geowire.config.yaml for advanced routing/budget/provider settings.",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}
