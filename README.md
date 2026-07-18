@@ -55,7 +55,7 @@ Add `"env": { "GOOGLE_MAPS_API_KEY": "..." }` to enable Google.
 
 ```bash
 npx @geowirehq/cli search "Eiffel Tower"          # terminal search with a results table
-npx @geowirehq/cli search "coffee" --near 37.4979,127.0276   # bias to a coordinate
+npx @geowirehq/cli search "Starbucks" --near 37.4979,127.0276 --radius 3000   # near a coordinate
 npx @geowirehq/cli                                # start the REST + MCP server (zero-config)
 npx @geowirehq/cli init                           # interactive setup wizard (.env + config)
 npx @geowirehq/cli test                           # check provider connections
