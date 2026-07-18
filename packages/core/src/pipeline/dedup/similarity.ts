@@ -87,9 +87,17 @@ export function jaroWinkler(a: string, b: string): number {
   return j + prefix * 0.1 * (1 - j);
 }
 
-/** 전화번호에서 숫자만 추출 */
-function phoneDigits(phone: string): string {
-  return phone.replace(/\D/gu, "");
+/**
+ * 전화번호를 비교용 NSN(national significant number) 근사치로 정규화한다.
+ * 숫자만 남긴 뒤 **국제 접두 `00`** 또는 **국내 트렁크 프리픽스 `0`** 한 자리를 벗긴다.
+ * 이렇게 하면 국제표기 `+82 2 1234 5678`(→`82212345678`)의 뒷자리가 국내표기
+ * `02-1234-5678`(→`0` 제거 `212345678`)와 endsWith로 일치한다(국가코드 테이블 불필요).
+ */
+export function phoneNsn(phone: string): string {
+  let d = phone.replace(/\D/gu, "");
+  if (d.startsWith("00")) d = d.slice(2); // 국제전화 접두 00
+  else if (d.startsWith("0")) d = d.slice(1); // 국내 트렁크 프리픽스 0
+  return d;
 }
 
 /** URL에서 호스트명(www. 제거) 추출. 실패 시 원문 소문자 */
@@ -124,11 +132,11 @@ export const PAIR_WEIGHTS = {
  * — 주소·전화·웹이 없다고 점수가 부당하게 낮아지지 않도록.
  * 좌표·이름은 항상 존재하므로 최소 신호는 보장된다.
  */
-/** 전화번호 일치(양쪽 존재 + 뒤 7자리 이상 일치) */
+/** 전화번호 일치(양쪽 존재 + NSN 뒤 7자리 이상 일치). 국가코드/선행 0 표기차를 흡수 */
 function phoneMatches(a: Place, b: Place): boolean {
   if (!a.contact?.phone || !b.contact?.phone) return false;
-  const pa = phoneDigits(a.contact.phone);
-  const pb = phoneDigits(b.contact.phone);
+  const pa = phoneNsn(a.contact.phone);
+  const pb = phoneNsn(b.contact.phone);
   return pa.length >= 7 && pb.length >= 7 && (pa.endsWith(pb) || pb.endsWith(pa));
 }
 

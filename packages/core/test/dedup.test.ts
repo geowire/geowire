@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { normalizeName, jaroWinkler, pairScore } from "../src/pipeline/dedup/similarity.js";
+import { normalizeName, jaroWinkler, pairScore, phoneNsn } from "../src/pipeline/dedup/similarity.js";
 import { dedup } from "../src/pipeline/dedup/dedup.js";
 import { mergeCluster } from "../src/pipeline/dedup/merge-fields.js";
 import { builtPlace } from "./helpers.js";
@@ -14,6 +14,22 @@ describe("normalizeName", () => {
   it("NFKC 정규화 + 소문자 + 구두점 정리", () => {
     expect(normalizeName("Ｃａｆé")).toBe("café");
     expect(normalizeName("GS25  강남점")).toBe("gs25 강남점");
+  });
+});
+
+describe("phoneNsn (국가코드/선행 0 정규화)", () => {
+  it("국제표기와 국내표기가 같은 NSN 꼬리를 갖는다 (KR)", () => {
+    // +82 2 1234 5678  vs  02-1234-5678
+    const intl = phoneNsn("+82-2-1234-5678"); // "82212345678"
+    const natl = phoneNsn("02-1234-5678"); // "212345678"
+    expect(intl.endsWith(natl) || natl.endsWith(intl)).toBe(true);
+  });
+  it("국내 트렁크 프리픽스 0을 벗긴다", () => {
+    expect(phoneNsn("02-888-7777")).toBe("28887777");
+    expect(phoneNsn("010-1234-5678")).toBe("1012345678");
+  });
+  it("국제 접두 00을 벗긴다", () => {
+    expect(phoneNsn("0082-2-1234-5678")).toBe("82212345678");
   });
 });
 
@@ -58,6 +74,13 @@ describe("pairScore", () => {
   it("교차문자 상호도 근접+전화(동일 뒷자리) 일치면 병합된다", () => {
     const g = builtPlace({ provider: "google", providerPlaceId: "ChIJ2", name: "Starbucks", location: { latitude: 37.4979, longitude: 127.0276 }, contact: { phone: "02-1234-5678" } });
     const n = builtPlace({ provider: "nominatim", providerPlaceId: "node/2", name: "스타벅스", location: { latitude: 37.49792, longitude: 127.02761 }, contact: { phone: "0212345678" } });
+    expect(pairScore(g, n)).toBe(1);
+  });
+
+  it("국제(+82)와 국내(02) 전화 표기 차이를 흡수해 병합된다 (KR 실사용)", () => {
+    // Google은 보통 +82 국제표기, 국내 데이터는 02 국내표기 — 이제 동일 번호로 인식
+    const g = builtPlace({ provider: "google", providerPlaceId: "ChIJ3", name: "Starbucks", location: { latitude: 37.4979, longitude: 127.0276 }, contact: { phone: "+82-2-1234-5678" } });
+    const n = builtPlace({ provider: "internal", providerPlaceId: "S1", name: "스타벅스 강남", location: { latitude: 37.49792, longitude: 127.02761 }, contact: { phone: "02-1234-5678" } });
     expect(pairScore(g, n)).toBe(1);
   });
 
