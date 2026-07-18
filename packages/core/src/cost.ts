@@ -31,6 +31,8 @@ export interface BudgetDecision {
 /**
  * 이번 달 누적 유료 API 비용을 추적한다 (설계 §8.3).
  * v0.1은 프로세스 메모리 카운터 — Redis 공유 카운터·월 롤오버는 v0.2.
+ * ⚠️ 알려진 한계: 예산 체크(applyBudget)와 record 사이 async 인터리브로 동시 요청이
+ * 월 상한을 소폭 초과할 수 있다(낙관적 추적). 원자적 예약/차감은 v0.2 Redis에서 해결.
  */
 export class CostTracker {
   private spent = 0;
@@ -61,10 +63,18 @@ export function applyBudget(
   registry: ProviderRegistry,
   budget: BudgetConfig,
   tracker: CostTracker,
+  /** 요청별 상한(RequestOptions.maxCostUSD). config 상한과 함께 더 낮은 값이 적용된다 */
+  requestMaxUSD?: number,
 ): BudgetDecision {
   const allowed: string[] = [];
   const skipped: string[] = [];
   let requestCost = 0;
+
+  // config.perRequestMaxUSD와 요청별 options.maxCostUSD 중 더 엄격한(작은) 값을 적용
+  const perRequestCaps = [budget.perRequestMaxUSD, requestMaxUSD].filter(
+    (v): v is number => v != null,
+  );
+  const perRequestCap = perRequestCaps.length > 0 ? Math.min(...perRequestCaps) : null;
 
   for (const id of providerIds) {
     const cost = providerCallCost(id, capability, registry);
@@ -72,8 +82,7 @@ export function applyBudget(
       allowed.push(id);
       continue;
     }
-    const overPerRequest =
-      budget.perRequestMaxUSD != null && requestCost + cost > budget.perRequestMaxUSD;
+    const overPerRequest = perRequestCap != null && requestCost + cost > perRequestCap;
     const overMonthly =
       budget.monthlyUSD != null && tracker.monthlyUSD + requestCost + cost > budget.monthlyUSD;
     if (overPerRequest || overMonthly) {

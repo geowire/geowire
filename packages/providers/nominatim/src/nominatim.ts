@@ -32,10 +32,14 @@ function viewboxParams(
   const latDelta = radius / METERS_PER_DEG_LAT;
   const cosLat = Math.max(Math.cos((near.latitude * Math.PI) / 180), 0.01);
   const lonDelta = radius / (METERS_PER_DEG_LAT * cosLat);
-  const left = near.longitude - lonDelta;
-  const right = near.longitude + lonDelta;
-  const top = near.latitude + latDelta;
-  const bottom = near.latitude - latDelta;
+  // 좌표를 유효 범위로 clamp — 날짜변경선(경도 ±180)·극지방(위도 ±90) 근처에서
+  // Nominatim이 거부/오동작하는 out-of-range viewbox를 방출하지 않도록.
+  const clampLat = (v: number): number => Math.min(90, Math.max(-90, v));
+  const clampLon = (v: number): number => Math.min(180, Math.max(-180, v));
+  const left = clampLon(near.longitude - lonDelta);
+  const right = clampLon(near.longitude + lonDelta);
+  const top = clampLat(near.latitude + latDelta);
+  const bottom = clampLat(near.latitude - latDelta);
   const viewbox = `${left},${top},${right},${bottom}`;
   return radiusMeters != null ? { viewbox, bounded: "1" } : { viewbox };
 }

@@ -76,6 +76,21 @@ describe("cost — estimate + budget gate", () => {
     expect(d.allowed).toEqual(["google", "nominatim"]);
     expect(d.skipped).toEqual([]);
   });
+
+  it("요청별 maxCostUSD가 config 상한과 무관하게 유료 공급자를 제외한다", () => {
+    const t = new CostTracker();
+    // config 예산은 없지만(넉넉), 요청 options.maxCostUSD=0.01 → google 제외
+    const d = applyBudget(["google", "nominatim"], "search", reg, {}, t, 0.01);
+    expect(d.skipped).toEqual(["google"]);
+    expect(d.allowed).toEqual(["nominatim"]);
+  });
+
+  it("config 상한과 요청 maxCostUSD 중 더 낮은 값이 적용된다", () => {
+    const t = new CostTracker();
+    // config 0.1는 통과시키지만 요청 0.001이 더 엄격 → google 제외
+    const d = applyBudget(["google"], "search", reg, { perRequestMaxUSD: 0.1 }, t, 0.001);
+    expect(d.skipped).toEqual(["google"]);
+  });
 });
 
 describe("CircuitBreaker", () => {

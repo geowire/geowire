@@ -96,6 +96,7 @@ export async function runOperation(
     host.registry,
     host.config.budget,
     host.costTracker,
+    spec.options?.maxCostUSD,
   );
   const budgetSkipped: ProviderSkip[] = budget.skipped.map((provider) => ({
     provider,

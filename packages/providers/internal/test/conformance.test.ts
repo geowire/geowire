@@ -89,4 +89,13 @@ C,좌표없음,abc,xyz`);
     const index = new StoreIndex(records);
     expect(index.places.map((p) => p.providerPlaceId)).toEqual(["A"]);
   });
+
+  it("WGS84 범위를 벗어난 좌표 행은 건너뛴다 (lat 200, lon 500 등)", () => {
+    const records = parseCsvRecords(`store_id,name,latitude,longitude
+OK,정상,37.5,127.0
+BADLAT,위도초과,200,127.0
+BADLON,경도초과,37.5,500`);
+    const index = new StoreIndex(records);
+    expect(index.places.map((p) => p.providerPlaceId)).toEqual(["OK"]);
+  });
 });

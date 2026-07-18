@@ -47,6 +47,32 @@ describe("pairScore", () => {
     const b = builtPlace({ provider: "g", providerPlaceId: "2", name: "약국", location: { latitude: 10.0001, longitude: 20.0001 }, contact: { phone: "02-888-7777" } });
     expect(pairScore(a, b)).toBeGreaterThan(0.9);
   });
+
+  it("교차문자 상호도 근접+웹 일치면 병합된다 (Starbucks vs 스타벅스)", () => {
+    // 이름 유사도 0이지만 같은 좌표 + 같은 웹사이트 → 동일 장소로 확정
+    const g = builtPlace({ provider: "google", providerPlaceId: "ChIJ1", name: "Starbucks", location: { latitude: 37.4979, longitude: 127.0276 }, contact: { website: "https://www.starbucks.co.kr/" } });
+    const n = builtPlace({ provider: "nominatim", providerPlaceId: "node/1", name: "스타벅스", location: { latitude: 37.49792, longitude: 127.02761 }, contact: { website: "http://starbucks.co.kr" } });
+    expect(pairScore(g, n)).toBe(1);
+  });
+
+  it("교차문자 상호도 근접+전화(동일 뒷자리) 일치면 병합된다", () => {
+    const g = builtPlace({ provider: "google", providerPlaceId: "ChIJ2", name: "Starbucks", location: { latitude: 37.4979, longitude: 127.0276 }, contact: { phone: "02-1234-5678" } });
+    const n = builtPlace({ provider: "nominatim", providerPlaceId: "node/2", name: "스타벅스", location: { latitude: 37.49792, longitude: 127.02761 }, contact: { phone: "0212345678" } });
+    expect(pairScore(g, n)).toBe(1);
+  });
+
+  it("교차문자 상호가 강한 식별자(전화/웹) 없이 좌표만 가까우면 병합 안 함 (안전)", () => {
+    // 같은 건물의 서로 다른 가게일 수 있으므로 이름 언어가 다르고 corroboration 없으면 미병합
+    const g = builtPlace({ provider: "google", providerPlaceId: "ChIJ2", name: "Starbucks", location: { latitude: 37.4979, longitude: 127.0276 } });
+    const n = builtPlace({ provider: "nominatim", providerPlaceId: "node/2", name: "스타벅스", location: { latitude: 37.49792, longitude: 127.02761 } });
+    expect(pairScore(g, n)).toBeLessThan(0.75);
+  });
+
+  it("전화가 같아도 멀리 떨어지면 병합 안 함 (프랜차이즈 공용번호 방어)", () => {
+    const a = builtPlace({ provider: "g", providerPlaceId: "1", name: "Starbucks", location: { latitude: 37.5, longitude: 127.0 }, contact: { phone: "1522-3232" } });
+    const b = builtPlace({ provider: "n", providerPlaceId: "2", name: "스타벅스", location: { latitude: 37.6, longitude: 127.1 }, contact: { phone: "1522-3232" } });
+    expect(pairScore(a, b)).toBeLessThan(0.75);
+  });
 });
 
 describe("dedup", () => {

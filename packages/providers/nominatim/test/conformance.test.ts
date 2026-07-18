@@ -143,4 +143,16 @@ describe("nominatim search location biasing", () => {
     expect(url.searchParams.get("viewbox")).toBeNull();
     expect(url.searchParams.get("bounded")).toBeNull();
   });
+
+  it("clamps the viewbox to valid ranges near the antimeridian / poles", async () => {
+    const { fetch, urls } = capturingFetch(searchBody);
+    await provider.searchPlaces!(
+      { query: "x", near: { latitude: 89.9, longitude: 179.9 }, radiusMeters: 50_000, limit: 3 },
+      createTestContext(fetch),
+    );
+    const viewbox = new URL(urls[0]!).searchParams.get("viewbox")!;
+    const [left, top, right, bottom] = viewbox.split(",").map(Number);
+    for (const lon of [left, right]) expect(Math.abs(lon)).toBeLessThanOrEqual(180);
+    for (const lat of [top, bottom]) expect(Math.abs(lat)).toBeLessThanOrEqual(90);
+  });
 });

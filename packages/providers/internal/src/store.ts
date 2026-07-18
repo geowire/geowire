@@ -47,6 +47,8 @@ export function recordToPlace(record: Record<string, string>, index: number): Pr
   const latitude = Number(pick(record, "lat"));
   const longitude = Number(pick(record, "lon"));
   if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+  // WGS84 유효 범위 밖(예: 오타로 lat=200)은 버린다 — 거리 계산·viewbox 오염 방지.
+  if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) return null;
 
   const categoriesRaw = pick(record, "categories");
   const place: ProviderPlace = {

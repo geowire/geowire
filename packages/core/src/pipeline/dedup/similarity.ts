@@ -124,7 +124,31 @@ export const PAIR_WEIGHTS = {
  * — 주소·전화·웹이 없다고 점수가 부당하게 낮아지지 않도록.
  * 좌표·이름은 항상 존재하므로 최소 신호는 보장된다.
  */
+/** 전화번호 일치(양쪽 존재 + 뒤 7자리 이상 일치) */
+function phoneMatches(a: Place, b: Place): boolean {
+  if (!a.contact?.phone || !b.contact?.phone) return false;
+  const pa = phoneDigits(a.contact.phone);
+  const pb = phoneDigits(b.contact.phone);
+  return pa.length >= 7 && pb.length >= 7 && (pa.endsWith(pb) || pb.endsWith(pa));
+}
+
+/** 웹사이트 호스트 일치(양쪽 존재) */
+function websiteMatches(a: Place, b: Place): boolean {
+  if (!a.contact?.website || !b.contact?.website) return false;
+  return hostname(a.contact.website) === hostname(b.contact.website);
+}
+
 export function pairScore(a: Place, b: Place): number {
+  const distance = distanceSignal(a, b);
+  const phoneMatch = phoneMatches(a, b);
+  const websiteMatch = websiteMatches(a, b);
+
+  // 언어/문자가 다른 상호(예: "Starbucks" vs "스타벅스")는 이름 유사도가 0이라
+  // 이름 가중치(30)가 항상 분모에 남아 최대 0.70 → 기본 임계값(0.75)을 못 넘어 병합 불가.
+  // 전화/웹은 문자 체계와 무관한 강한 식별자이므로, **근접(≤~262m) + 전화/웹 정확 일치**면
+  // 이름 언어와 무관하게 동일 장소로 확정한다. (근접 조건은 프랜차이즈 공용번호 오병합 방지)
+  if (distance >= 0.5 && (phoneMatch || websiteMatch)) return 1;
+
   let weightedSum = 0;
   let activeWeight = 0;
 
@@ -133,7 +157,7 @@ export function pairScore(a: Place, b: Place): number {
     activeWeight += weight;
   };
 
-  add(PAIR_WEIGHTS.location, distanceSignal(a, b));
+  add(PAIR_WEIGHTS.location, distance);
   add(PAIR_WEIGHTS.name, jaroWinkler(normalizeName(a.name), normalizeName(b.name)));
 
   if (a.address?.formatted && b.address?.formatted) {
@@ -143,13 +167,10 @@ export function pairScore(a: Place, b: Place): number {
     );
   }
   if (a.contact?.phone && b.contact?.phone) {
-    const pa = phoneDigits(a.contact.phone);
-    const pb = phoneDigits(b.contact.phone);
-    const match = pa.length >= 7 && pb.length >= 7 && (pa.endsWith(pb) || pb.endsWith(pa));
-    add(PAIR_WEIGHTS.phone, match ? 1 : 0);
+    add(PAIR_WEIGHTS.phone, phoneMatch ? 1 : 0);
   }
   if (a.contact?.website && b.contact?.website) {
-    add(PAIR_WEIGHTS.website, hostname(a.contact.website) === hostname(b.contact.website) ? 1 : 0);
+    add(PAIR_WEIGHTS.website, websiteMatch ? 1 : 0);
   }
 
   return activeWeight === 0 ? 0 : weightedSum / activeWeight;
