@@ -50,5 +50,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # 공급자 패키지만 conformance 테스트 — 모두 픽스처 기반, 외부 실호출 없음
-      - run: pnpm --filter "@geowire/provider-*" test
+      # 공급자 패키지만 conformance 테스트 — 모두 픽스처 기반, 외부 실호출 없음.
+      # turbo 경유로 실행해 워크스페이스 의존성(@geowire/schema 등)을 먼저 빌드한다
+      # (pnpm --filter ...는 turbo 그래프를 우회해 dist 미빌드로 resolve 실패).
+      - run: pnpm exec turbo run test --filter="@geowire/provider-*"
