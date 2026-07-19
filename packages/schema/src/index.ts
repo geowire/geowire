@@ -6,6 +6,7 @@ export {
   PlaceSource,
   Place,
   PLACE_ID_PREFIX,
+  formatAddress,
 } from "./place.js";
 export { ProviderErrorCode } from "./errors.js";
 export { CountryCode } from "./country.js";

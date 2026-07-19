@@ -21,6 +21,32 @@ export const Address = z.object({
 });
 export type Address = z.infer<typeof Address>;
 
+let _regionNames: Intl.DisplayNames | undefined;
+/** ISO 3166-1 alpha-2 → 영어 국가명 (Intl.DisplayNames, 실패 시 코드 그대로) */
+function countryName(code: string): string {
+  try {
+    _regionNames ??= new Intl.DisplayNames(["en"], { type: "region" });
+    return _regionNames.of(code) ?? code;
+  } catch {
+    return code;
+  }
+}
+
+/**
+ * 구조화 필드로 **공급자 무관 표준 표시 주소**를 조립한다 (구체 → 광역 순).
+ * `street, district, city, region, postalCode`(존재하는 것만)를 `, `로 잇고 국가명을 덧붙인다.
+ * 구조화 파트(비국가)가 2개 미만이면 undefined를 반환해 호출부가 공급자 원문을 유지하도록 한다
+ * (빈약한 구조화로 더 나쁜 문자열을 만들지 않기 위함).
+ */
+export function formatAddress(a: Address): string | undefined {
+  const local = [a.street, a.district, a.city, a.region, a.postalCode].filter(
+    (v): v is string => typeof v === "string" && v.trim().length > 0,
+  );
+  if (local.length < 2) return undefined;
+  const parts = a.country ? [...local, countryName(a.country)] : local;
+  return parts.join(", ");
+}
+
 export const Contact = z.object({
   phone: z.string().optional(),
   website: z.url().optional(),

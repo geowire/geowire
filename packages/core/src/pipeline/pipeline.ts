@@ -7,6 +7,7 @@ import type {
   ResponseMeta,
   Strategy,
 } from "@geowirehq/schema";
+import { formatAddress } from "@geowirehq/schema";
 import type { GeoWireConfig } from "../config/schema.js";
 import type { ProviderRegistry } from "../registry.js";
 import type { CacheAdapter } from "../cache/adapter.js";
@@ -152,6 +153,11 @@ export async function runOperation(
   // 7. policy: attribution 주입 + 혼합 캐시 TTL 상한 (merge→policy→cache 순서)
   const policy = applyPolicy(limited, host.registry, host.config.cache.defaultTtlSeconds);
 
+  // 7b. 표시 주소 통일: 구조화 필드로 공급자 무관 표준 formatted를 재생성한다
+  // (OSM display_name vs Google formattedAddress처럼 스타일이 달라지는 것을 방지).
+  // 구조화 필드가 빈약하면 formatAddress가 undefined → 공급자 원문 유지.
+  const results = limited.map(standardizeAddress);
+
   // 8. 비용 집계 (실제 사용한 공급자 기준) + 사용량 누적
   const usedIds = used.map((u) => u.provider);
   const estimatedCostUSD = estimateCost(usedIds, spec.capability, host.registry);
@@ -172,8 +178,16 @@ export async function runOperation(
   // 10. 캐시 저장 (policy 허용 + 성공 응답일 때만).
   // 아무 공급자도 성공하지 못한 응답(전부 실패/스킵)은 캐시하지 않는다 — 장애를 캐시에 굳히지 않도록.
   if (policy.cacheTtlSeconds != null && used.length > 0) {
-    await host.cache.set(key, { results: limited, meta, ttlSeconds: policy.cacheTtlSeconds });
+    await host.cache.set(key, { results, meta, ttlSeconds: policy.cacheTtlSeconds });
   }
 
-  return { results: limited, meta };
+  return { results, meta };
+}
+
+/** Place의 address.formatted를 구조화 필드 기반 표준 형식으로 재생성한다(충분할 때만). */
+function standardizeAddress(place: Place): Place {
+  if (!place.address) return place;
+  const std = formatAddress(place.address);
+  if (std == null || std === place.address.formatted) return place;
+  return { ...place, address: { ...place.address, formatted: std } };
 }

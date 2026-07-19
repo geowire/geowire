@@ -1,5 +1,30 @@
 import { describe, expect, it } from "vitest";
-import { Place, PlaceSource } from "../src/index.js";
+import { Place, PlaceSource, formatAddress } from "../src/index.js";
+
+describe("formatAddress — 공급자 무관 표준 표시 주소", () => {
+  it("구조화 필드를 구체→광역 순으로 결합하고 국가명을 붙인다", () => {
+    expect(
+      formatAddress({
+        street: "West 34th Street",
+        city: "New York",
+        region: "New York",
+        postalCode: "10001",
+        country: "US",
+      }),
+    ).toBe("West 34th Street, New York, New York, 10001, United States");
+  });
+
+  it("존재하는 필드만 결합한다 (district 포함, 누락 필드 생략)", () => {
+    expect(
+      formatAddress({ district: "강남구", city: "서울특별시", postalCode: "06232", country: "KR" }),
+    ).toBe("강남구, 서울특별시, 06232, South Korea");
+  });
+
+  it("구조화 파트(비국가)가 2개 미만이면 undefined (공급자 원문 유지용)", () => {
+    expect(formatAddress({ city: "서울", country: "KR", formatted: "원문" })).toBeUndefined();
+    expect(formatAddress({ formatted: "raw only" })).toBeUndefined();
+  });
+});
 
 const validSource = {
   provider: "nominatim",

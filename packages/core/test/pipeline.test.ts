@@ -127,6 +127,32 @@ describe("Place 정규화", () => {
     expect(res.results.map((r) => r.name)).toEqual(["가까운곳"]);
   });
 
+  it("표시 주소(formatted)를 구조화 필드 기반 표준 형식으로 통일한다", async () => {
+    const geo = createGeoWire({
+      providers: [
+        fakeProvider({
+          id: "p",
+          search: [
+            place({
+              providerPlaceId: "1",
+              name: "Empire State Building",
+              location: { latitude: 40.7484, longitude: -73.9857 },
+              address: {
+                formatted: "공급자 원문(장황한 계층 문자열)",
+                city: "New York",
+                region: "New York",
+                postalCode: "10001",
+                country: "US",
+              },
+            }),
+          ],
+        }),
+      ],
+    });
+    const res = await geo.searchPlaces({ query: "x" });
+    expect(res.results[0]!.address!.formatted).toBe("New York, New York, 10001, United States");
+  });
+
   it("limit을 적용한다", async () => {
     const geo = createGeoWire({
       providers: [
