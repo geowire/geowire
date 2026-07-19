@@ -37,6 +37,15 @@ enforces each provider's caching/attribution terms.
 | Your own place data as a provider | ❌ | ❌ | ✅ |
 | Transparent provenance (which source, what cost) | ❌ | ❌ | ✅ (every response) |
 
+**Not a Google replacement — it *uses* Google.** The thing no single provider can
+do: merge **your own store data + Google + OSM** into one deduped record, with
+per-field provenance (your name is authoritative, Google adds ratings, OSM adds
+coordinates). Real run below:
+
+<p align="center">
+  <img src="docs/media/geowire-merge.gif" alt="GeoWire merging a private store DB, Google, and OpenStreetMap into one record with per-field provenance" width="760">
+</p>
+
 ## Quickstart
 
 ### 1. MCP (Claude Desktop / Cursor) — 30 seconds
