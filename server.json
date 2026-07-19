@@ -6,14 +6,14 @@
     "url": "https://github.com/geowire/geowire",
     "source": "github"
   },
-  "version": "0.1.7",
+  "version": "0.1.8",
   "websiteUrl": "https://geowire.dev",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@geowirehq/mcp",
-      "version": "0.1.7",
+      "version": "0.1.8",
       "transport": {
         "type": "stdio"
       },

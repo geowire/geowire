@@ -35,6 +35,12 @@ importers:
       '@geowirehq/provider-internal':
         specifier: workspace:*
         version: link:../../packages/providers/internal
+      '@geowirehq/provider-kakao':
+        specifier: workspace:*
+        version: link:../../packages/providers/kakao
+      '@geowirehq/provider-naver':
+        specifier: workspace:*
+        version: link:../../packages/providers/naver
       '@geowirehq/provider-nominatim':
         specifier: workspace:*
         version: link:../../packages/providers/nominatim
@@ -146,6 +152,12 @@ importers:
       '@geowirehq/provider-internal':
         specifier: workspace:*
         version: link:../providers/internal
+      '@geowirehq/provider-kakao':
+        specifier: workspace:*
+        version: link:../providers/kakao
+      '@geowirehq/provider-naver':
+        specifier: workspace:*
+        version: link:../providers/naver
       '@geowirehq/provider-nominatim':
         specifier: workspace:*
         version: link:../providers/nominatim
@@ -233,6 +245,50 @@ importers:
         version: 3.2.7(@types/node@22.20.1)(yaml@2.9.0)
 
   packages/providers/internal:
+    dependencies:
+      '@geowirehq/provider-sdk':
+        specifier: workspace:*
+        version: link:../../provider-sdk
+      '@geowirehq/schema':
+        specifier: workspace:*
+        version: link:../../schema
+    devDependencies:
+      '@geowirehq/provider-testkit':
+        specifier: workspace:*
+        version: link:../../provider-testkit
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.1
+      typescript:
+        specifier: ^5.8.0
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.0
+        version: 3.2.7(@types/node@22.20.1)(yaml@2.9.0)
+
+  packages/providers/kakao:
+    dependencies:
+      '@geowirehq/provider-sdk':
+        specifier: workspace:*
+        version: link:../../provider-sdk
+      '@geowirehq/schema':
+        specifier: workspace:*
+        version: link:../../schema
+    devDependencies:
+      '@geowirehq/provider-testkit':
+        specifier: workspace:*
+        version: link:../../provider-testkit
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.1
+      typescript:
+        specifier: ^5.8.0
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.0
+        version: 3.2.7(@types/node@22.20.1)(yaml@2.9.0)
+
+  packages/providers/naver:
     dependencies:
       '@geowirehq/provider-sdk':
         specifier: workspace:*

@@ -1,6 +1,6 @@
 {
   "name": "@geowirehq/provider-sdk",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "GeoWire provider contract — the interface every geo provider implements",
   "license": "Apache-2.0",
   "type": "module",

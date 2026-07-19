@@ -1,6 +1,6 @@
 {
   "name": "@geowirehq/mcp",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "mcpName": "io.github.geowire/geowire",
   "description": "GeoWire MCP server — search_places, get_place, geocode_address, reverse_geocode, list_geo_providers",
   "license": "Apache-2.0",
@@ -29,6 +29,8 @@
     "@geowirehq/provider-nominatim": "workspace:*",
     "@geowirehq/provider-google": "workspace:*",
     "@geowirehq/provider-internal": "workspace:*",
+    "@geowirehq/provider-kakao": "workspace:*",
+    "@geowirehq/provider-naver": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "zod": "^4.0.0"
   },

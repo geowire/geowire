@@ -4,8 +4,12 @@ GeoWire is a standard MCP server over **stdio** (`npx -y @geowirehq/mcp`) or
 **HTTP** (`POST http://localhost:4980/mcp`). It exposes 5 tools: `search_places`,
 `geocode_address`, `reverse_geocode`, `get_place`, `list_geo_providers`.
 
-Works with **zero API keys** (OpenStreetMap). Add a Google key by including
-`"env": { "GOOGLE_MAPS_API_KEY": "..." }` in any config below.
+Works with **zero API keys** (OpenStreetMap). Enable more providers by adding an
+`"env"` block to any config below:
+- Google: `"GOOGLE_MAPS_API_KEY": "..."`
+- Kakao (KR): `"KAKAO_REST_API_KEY": "..."`
+- Naver (KR): `"NAVER_CLIENT_ID": "...", "NAVER_CLIENT_SECRET": "..."`
+- Your own places: `"GEOWIRE_INTERNAL_CSV": "/path/to/places.csv"`
 
 ## Claude Desktop / Claude Code
 

@@ -4,6 +4,8 @@ import type { GeoProvider, Logger } from "@geowirehq/provider-sdk";
 import { createNominatimProvider } from "@geowirehq/provider-nominatim";
 import { createGoogleProvider } from "@geowirehq/provider-google";
 import { createInternalProvider } from "@geowirehq/provider-internal";
+import { createKakaoProvider } from "@geowirehq/provider-kakao";
+import { createNaverProvider } from "@geowirehq/provider-naver";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createGeoWireMcpServer } from "./server.js";
 
@@ -24,6 +26,14 @@ async function main(): Promise<void> {
 
   const internalCsv = process.env.GEOWIRE_INTERNAL_CSV;
   if (internalCsv) providers.push(createInternalProvider({ source: internalCsv }));
+
+  const kakaoKey = process.env.KAKAO_REST_API_KEY;
+  if (kakaoKey) providers.push(createKakaoProvider({ apiKey: kakaoKey }));
+
+  const naverId = process.env.NAVER_CLIENT_ID;
+  const naverSecret = process.env.NAVER_CLIENT_SECRET;
+  if (naverId && naverSecret)
+    providers.push(createNaverProvider({ clientId: naverId, clientSecret: naverSecret }));
 
   const config = loadConfig(process.env.GEOWIRE_CONFIG);
   const geo = createGeoWire({ providers, config, logger: stderrLogger });

@@ -182,6 +182,8 @@ the coordinates came from OSM. Walkthrough: [docs/recipes.md](./docs/recipes.md#
 providers:
   nominatim: { enabled: true }                       # default ON, no key
   google:    { enabled: true, apiKey: ${GOOGLE_MAPS_API_KEY} }
+  kakao:     { enabled: true }                        # env KAKAO_REST_API_KEY (KR)
+  naver:     { enabled: true }                        # env NAVER_CLIENT_ID + NAVER_CLIENT_SECRET (KR)
   internal:  { enabled: true, source: ./my-places.csv, priority: 100 }
 routing:
   defaultStrategy: merge          # first-success | merge
@@ -197,7 +199,12 @@ Keys come from the environment (`${VAR}`), never committed in plaintext.
 |---|---|---|
 | `@geowirehq/provider-nominatim` (OpenStreetMap) | none | search, geocode, reverseGeocode |
 | `@geowirehq/provider-google` (Maps Platform) | BYOK | search, geocode, reverseGeocode, getPlace |
+| `@geowirehq/provider-kakao` (카카오맵, KR) | BYOK `KAKAO_REST_API_KEY` | search, geocode, reverseGeocode |
+| `@geowirehq/provider-naver` (네이버 지역검색, KR) | BYOK `NAVER_CLIENT_ID`+`NAVER_CLIENT_SECRET` | search, geocode |
 | `@geowirehq/provider-internal` (your CSV) | none | search |
+
+Kakao & Naver make Korea coverage first-class (where OSM is thin and Google has
+gaps) — merge all four + your own store data into one deduped record.
 
 Want another provider? See [CONTRIBUTING.md](./CONTRIBUTING.md) —
 *"Write a provider in 30 minutes"*.
@@ -223,7 +230,7 @@ v0.1 is deliberately "It works" scope. Honest about what's **not** in it yet:
 | Strategies | `first-success`, `merge` | `cost-aware`, `fastest`, `weighted` (v0.3) |
 | Routing | explicit `country` | country **inference** from coordinates (v0.3) |
 | Cache | in-memory (LRU) | **Redis** adapter (v0.2) |
-| Providers | OSM, Google, your CSV | Mapbox, Foursquare, Kakao, Naver (community PRs welcome) |
+| Providers | OSM, Google, **Kakao, Naver** (KR), your CSV | Mapbox, Foursquare, Baidu, … (community PRs welcome) |
 | Rate limiting | per-provider (OSM 1 req/s) | global / per-endpoint |
 
 ## Architecture

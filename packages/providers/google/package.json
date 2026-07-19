@@ -1,6 +1,6 @@
 {
   "name": "@geowirehq/provider-google",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "GeoWire Google Maps Platform provider — BYOK (Places API New + Geocoding)",
   "license": "Apache-2.0",
   "type": "module",
