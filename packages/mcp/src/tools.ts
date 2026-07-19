@@ -34,6 +34,14 @@ const EMPTY_INPUT: Tool["inputSchema"] = {
   additionalProperties: false,
 };
 
+const TOOL_CALL_EXAMPLES: Record<string, string> = {
+  search_places:
+    '{"query":"24-hour pharmacy","near":{"latitude":10.7769,"longitude":106.7009}}',
+  get_place: '{"id":"google:ChIJN1t_tDeuEmsRUsoyG83frY4"}',
+  geocode_address: '{"address":"1600 Amphitheatre Parkway, Mountain View, CA"}',
+  reverse_geocode: '{"location":{"latitude":37.5665,"longitude":126.978}}',
+};
+
 /**
  * 도구 설명문 = 제품 (설계 §9.1).
  * LLM이 올바른 도구를 고르고 인자를 채우도록 목적·구분·예시를 명시한다.
@@ -102,7 +110,8 @@ function formatZodError(toolName: string, err: z.ZodError): string {
   const issues = err.issues
     .map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`)
     .join("; ");
-  return `Invalid arguments for ${toolName}: ${issues}.`;
+  const example = TOOL_CALL_EXAMPLES[toolName];
+  return `Invalid arguments for ${toolName}: ${issues}.${example ? ` Example: ${example}` : ""}`;
 }
 
 /**
