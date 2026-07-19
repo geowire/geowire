@@ -145,6 +145,7 @@ describe("GeoWire MCP 서버 — 에러 처리", () => {
     const content = res.content as Array<{ text: string }>;
     expect(content[0]!.text).toContain("Invalid arguments for search_places");
     expect(content[0]!.text).toContain("query");
+    expect(content[0]!.text).toContain('Example: {"query":"24-hour pharmacy"');
   });
 
   it("찾을 수 없는 place는 안내 메시지 (에러 아님)", async () => {
