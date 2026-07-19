@@ -9,6 +9,13 @@ const searchBody = {
       id: "ChIJgangnam1",
       displayName: { text: "GS25 강남점", languageCode: "ko" },
       formattedAddress: "서울특별시 강남구 테헤란로 1",
+      addressComponents: [
+        { longText: "테헤란로", shortText: "테헤란로", types: ["route"] },
+        { longText: "강남구", shortText: "강남구", types: ["sublocality_level_1", "sublocality", "political"] },
+        { longText: "서울특별시", shortText: "서울특별시", types: ["locality", "political"] },
+        { longText: "대한민국", shortText: "KR", types: ["country", "political"] },
+        { longText: "06232", shortText: "06232", types: ["postal_code"] },
+      ],
       location: { latitude: 37.498, longitude: 127.028 },
       types: ["convenience_store", "store", "point_of_interest", "establishment"],
       rating: 4.2,
@@ -88,6 +95,18 @@ describe("createGoogleProvider — BYOK", () => {
     expect(places[0]!.business?.rating).toBe(4.2);
     expect(places[0]!.business?.priceLevel).toBe(1);
     expect(places[0]!.localizedNames).toEqual({ ko: "GS25 강남점" });
+  });
+
+  it("검색 결과도 addressComponents를 구조화 주소 필드로 파싱한다 (geocode와 동일 스키마)", async () => {
+    const ctx = createTestContext(jsonFetch(searchBody));
+    const places = await provider.searchPlaces!({ query: "GS25", limit: 10 }, ctx);
+    const addr = places[0]!.address!;
+    expect(addr.formatted).toBe("서울특별시 강남구 테헤란로 1");
+    expect(addr.country).toBe("KR");
+    expect(addr.city).toBe("서울특별시");
+    expect(addr.district).toBe("강남구");
+    expect(addr.street).toBe("테헤란로");
+    expect(addr.postalCode).toBe("06232");
   });
 
   it("Geocoding status가 REQUEST_DENIED면 AUTH_FAILED로 정규화한다", async () => {

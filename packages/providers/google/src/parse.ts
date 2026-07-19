@@ -18,6 +18,44 @@ export interface GooglePlace {
   internationalPhoneNumber?: string;
   websiteUri?: string;
   priceLevel?: string;
+  addressComponents?: Array<{ longText?: string; shortText?: string; types?: string[] }>;
+}
+
+/**
+ * Google 주소 컴포넌트(타입 기반) 하나를 표준 Address 필드에 매핑한다.
+ * Places API (New)의 `{longText,shortText}`와 Geocoding API의 `{long_name,short_name}`을
+ * 공통 로직으로 처리하기 위한 헬퍼 — 두 경로가 동일한 구조화 결과를 내도록 보장한다.
+ */
+function applyAddressComponent(
+  address: Address,
+  long: string | undefined,
+  short: string | undefined,
+  types: readonly string[],
+): void {
+  if (types.includes("country") && short) {
+    const cc = CountryCode.safeParse(short);
+    if (cc.success) address.country = cc.data;
+  } else if (types.includes("administrative_area_level_1") && long) {
+    address.region = long;
+  } else if (types.includes("locality") && long) {
+    address.city = long;
+  } else if (types.some((t) => t.startsWith("sublocality")) && long) {
+    address.district = long;
+  } else if (types.includes("route") && long) {
+    address.street = long;
+  } else if (types.includes("postal_code") && long) {
+    address.postalCode = long;
+  }
+}
+
+/** Places API (New) place → 표준 Address (formatted + 구조화 필드). */
+function parsePlaceAddress(raw: GooglePlace): Address | undefined {
+  const address: Address = {};
+  if (raw.formattedAddress) address.formatted = raw.formattedAddress;
+  for (const c of raw.addressComponents ?? []) {
+    applyAddressComponent(address, c.longText, c.shortText, c.types ?? []);
+  }
+  return Object.keys(address).length > 0 ? address : undefined;
 }
 
 const PRICE_LEVEL: Record<string, number> = {
@@ -46,7 +84,8 @@ export function parseGooglePlace(raw: GooglePlace): ProviderPlace | null {
   const lang = raw.displayName?.languageCode;
   if (name && lang) place.localizedNames = { [lang]: name };
 
-  if (raw.formattedAddress) place.address = { formatted: raw.formattedAddress };
+  const address = parsePlaceAddress(raw);
+  if (address) place.address = address;
 
   const contact: Contact = {};
   const phone = raw.nationalPhoneNumber ?? raw.internationalPhoneNumber;
@@ -128,21 +167,7 @@ function parseGeocodeAddress(raw: GeocodeResult): Address | undefined {
   const address: Address = {};
   if (raw.formatted_address) address.formatted = raw.formatted_address;
   for (const c of raw.address_components ?? []) {
-    const types = c.types ?? [];
-    if (types.includes("country") && c.short_name) {
-      const cc = CountryCode.safeParse(c.short_name);
-      if (cc.success) address.country = cc.data;
-    } else if (types.includes("administrative_area_level_1") && c.long_name) {
-      address.region = c.long_name;
-    } else if (types.includes("locality") && c.long_name) {
-      address.city = c.long_name;
-    } else if (types.includes("sublocality") && c.long_name) {
-      address.district = c.long_name;
-    } else if (types.includes("route") && c.long_name) {
-      address.street = c.long_name;
-    } else if (types.includes("postal_code") && c.long_name) {
-      address.postalCode = c.long_name;
-    }
+    applyAddressComponent(address, c.long_name, c.short_name, c.types ?? []);
   }
   return Object.keys(address).length > 0 ? address : undefined;
 }

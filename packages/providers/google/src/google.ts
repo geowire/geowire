@@ -29,6 +29,7 @@ const PLACE_FIELDS = [
   "id",
   "displayName",
   "formattedAddress",
+  "addressComponents",
   "location",
   "types",
   "primaryType",
