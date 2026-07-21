@@ -186,7 +186,11 @@ providers:
   naver:     { enabled: true }                        # env NAVER_CLIENT_ID + NAVER_CLIENT_SECRET (KR)
   internal:  { enabled: true, source: ./my-places.csv, priority: 100 }
 routing:
-  defaultStrategy: merge          # first-success | merge
+  defaultStrategy: merge          # first-success | merge | cost-aware | weighted
+  providerWeights:                # for `weighted`: order by priority·cost·coverage
+    priority: 0.5
+    cost: 0.3
+    coverage: 0.2
 budget:
   perRequestMaxUSD: 0.10          # over-budget paid providers are skipped, free ones used
 ```
@@ -227,7 +231,7 @@ v0.1 is deliberately "It works" scope. Honest about what's **not** in it yet:
 | Area | v0.1 | Planned |
 |---|---|---|
 | Operations | search, geocode, reverse-geocode, get-place | **autocomplete** (typed, not wired) |
-| Strategies | `first-success`, `merge` | `cost-aware`, `fastest`, `weighted` (v0.3) |
+| Strategies | `first-success`, `merge`, **`cost-aware`**, **`weighted`** | `fastest` (latency race) |
 | Routing | explicit `country` | country **inference** from coordinates (v0.3) |
 | Cache | in-memory (LRU) | **Redis** adapter (v0.2) |
 | Providers | OSM, Google, **Kakao, Naver** (KR), your CSV | Mapbox, Foursquare, Baidu, … (community PRs welcome) |

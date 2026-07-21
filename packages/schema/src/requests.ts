@@ -4,11 +4,13 @@ import { CountryCode } from "./country.js";
 
 /**
  * 공급자 호출 전략 (설계 §7.2).
- * v0.1 공개 계약은 실제 구현 범위인 `first-success`·`merge`만 노출한다.
- * `fastest`/`weighted`/`cost-aware`는 후속 버전(§11 v0.3)에서 실제 구현·conformance
- * 테스트와 함께 추가한다 — 스키마가 미구현 전략을 유효 입력으로 광고하지 않도록.
+ * - `first-success`: 우선순위 순서로 하나씩, 첫 결과에서 정지.
+ * - `merge`: 전부 병렬 호출 후 dedup 병합.
+ * - `cost-aware`: 비용 오름차순(무료 먼저)으로 first-success — 유료 공급자는 무료가 답 못 할 때만.
+ * - `weighted`: priority·cost·coverage 가중 점수 순서로 first-success (요청 국가에 맞춰 라우팅).
+ * `fastest`(지연 최적화 병렬 레이스)는 후속 버전(§11)에서 추가 예정.
  */
-export const Strategy = z.enum(["first-success", "merge"]);
+export const Strategy = z.enum(["first-success", "merge", "cost-aware", "weighted"]);
 export type Strategy = z.infer<typeof Strategy>;
 
 /** 모든 요청에서 공통으로 오버라이드 가능한 옵션 */

@@ -238,6 +238,20 @@ still answers from OpenStreetMap. The response tells you plainly:
 }
 ```
 
+**Or route by cost.** The `cost-aware` strategy tries providers cheapest-first
+(free before paid) and stops at the first with results — so you only pay for
+Google when OpenStreetMap/Kakao/your CSV can't answer:
+
+```bash
+GOOGLE_MAPS_API_KEY=... npx @geowirehq/cli search "Eiffel Tower" --strategy cost-aware
+# used: nominatim · cost: $0   (Google never called — OSM answered)
+```
+
+`weighted` goes further: it orders providers per request by a score over
+priority, cost, and **coverage** — so a `country: KR` request routes to Kakao/
+Naver first, a cost-sensitive one routes to free providers first. Tune the mix
+in `routing.providerWeights`.
+
 ---
 
 ## 7. Route by country

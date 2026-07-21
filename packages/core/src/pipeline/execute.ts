@@ -114,7 +114,9 @@ async function invokeOne(
 
 /**
  * 계획된 공급자들을 전략에 따라 호출한다 (설계 §7.1 Execute).
- * first-success: 순차, 첫 결과에서 정지. merge: 전부 병렬.
+ * - merge: 전부 병렬 호출.
+ * - 그 외(first-success·cost-aware·weighted): 순차 호출·첫 결과에서 정지.
+ *   순서는 plan 단계에서 전략별로 이미 정렬됨(cost 오름차순 / 가중 점수) → 여기선 실행만 동일.
  * 각 호출의 성공/실패는 ProviderInvocation으로 수집되어 meta 조립에 쓰인다.
  */
 export async function executeOperation(

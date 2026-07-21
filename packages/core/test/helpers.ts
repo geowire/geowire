@@ -40,6 +40,7 @@ export interface FakeProviderSpec {
   capabilities?: ProviderManifest["capabilities"];
   policy?: ProviderManifest["policy"];
   cost?: ProviderManifest["cost"];
+  coverage?: ProviderManifest["coverage"];
   /** 고정 검색 결과. 함수면 요청마다 계산 */
   search?: ProviderPlace[] | (() => ProviderPlace[]);
   /** 지정 시 searchPlaces가 이 코드로 GeoProviderError를 던진다 */
@@ -60,6 +61,7 @@ export function fakeProvider(spec: FakeProviderSpec): GeoProvider {
     capabilities: caps,
     policy: spec.policy,
     cost: spec.cost,
+    coverage: spec.coverage,
   });
 
   const run = (): ProviderPlace[] => {

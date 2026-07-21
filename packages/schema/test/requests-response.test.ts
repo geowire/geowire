@@ -32,12 +32,17 @@ describe("SearchPlacesRequest", () => {
     ).toThrow();
   });
 
-  it("rejects strategies not yet implemented in v0.1", () => {
-    for (const strategy of ["fastest", "weighted", "cost-aware"]) {
-      expect(() =>
-        SearchPlacesRequest.parse({ query: "pharmacy", options: { strategy } }),
-      ).toThrow();
+  it("accepts cost-aware / weighted strategies", () => {
+    for (const strategy of ["cost-aware", "weighted"]) {
+      const parsed = SearchPlacesRequest.parse({ query: "pharmacy", options: { strategy } });
+      expect(parsed.options?.strategy).toBe(strategy);
     }
+  });
+
+  it("still rejects strategies not yet implemented (fastest)", () => {
+    expect(() =>
+      SearchPlacesRequest.parse({ query: "pharmacy", options: { strategy: "fastest" } }),
+    ).toThrow();
   });
 });
 

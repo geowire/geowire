@@ -33,11 +33,24 @@ export const CountryRouting = z.object({
 });
 export type CountryRouting = z.infer<typeof CountryRouting>;
 
+/** `weighted` 전략의 공급자 순서 결정 가중치 (합이 1일 필요는 없음, 상대 비율로만 사용) */
+export const ProviderWeights = z.object({
+  /** 높은 priority 선호 */
+  priority: z.number().nonnegative().default(0.5),
+  /** 저비용(무료) 선호 */
+  cost: z.number().nonnegative().default(0.3),
+  /** 요청 국가를 커버하는 공급자 선호 */
+  coverage: z.number().nonnegative().default(0.2),
+});
+export type ProviderWeights = z.infer<typeof ProviderWeights>;
+
 export const RoutingConfig = z.object({
   defaultStrategy: Strategy.default("first-success"),
   /** ISO 3166-1 alpha-2 → 라우팅 오버라이드 */
   countries: z.record(CountryCode, CountryRouting).default({}),
   rank: RankWeights.prefault({}),
+  /** `weighted` 전략의 공급자 순서 가중치 */
+  providerWeights: ProviderWeights.prefault({}),
 });
 export type RoutingConfig = z.infer<typeof RoutingConfig>;
 
