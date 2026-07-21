@@ -8,9 +8,9 @@ import { CountryCode } from "./country.js";
  * - `merge`: 전부 병렬 호출 후 dedup 병합.
  * - `cost-aware`: 비용 오름차순(무료 먼저)으로 first-success — 유료 공급자는 무료가 답 못 할 때만.
  * - `weighted`: priority·cost·coverage 가중 점수 순서로 first-success (요청 국가에 맞춰 라우팅).
- * `fastest`(지연 최적화 병렬 레이스)는 후속 버전(§11)에서 추가 예정.
+ * - `fastest`: 전부 병렬 호출, 결과를 가진 첫 응답(최저 지연)에서 즉시 반환. 지연 최적화.
  */
-export const Strategy = z.enum(["first-success", "merge", "cost-aware", "weighted"]);
+export const Strategy = z.enum(["first-success", "merge", "cost-aware", "weighted", "fastest"]);
 export type Strategy = z.infer<typeof Strategy>;
 
 /** 모든 요청에서 공통으로 오버라이드 가능한 옵션 */

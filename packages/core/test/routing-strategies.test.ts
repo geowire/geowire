@@ -106,3 +106,29 @@ describe("weighted 전략", () => {
     expect(order).toEqual(["nominatim"]);
   });
 });
+
+describe("fastest 전략", () => {
+  it("가장 빨리 결과를 낸 공급자를 반환하고 느린 공급자는 버린다", async () => {
+    const geo = createGeoWire({
+      providers: [
+        fakeProvider({ id: "slow", delayMs: 60, search: [place({ providerPlaceId: "s", name: "SLOW" })] }),
+        fakeProvider({ id: "fast", delayMs: 5, search: [place({ providerPlaceId: "f", name: "FAST" })] }),
+      ],
+    });
+    const res = await geo.searchPlaces({ query: "x", options: { strategy: "fastest" } });
+    expect(res.results[0]!.name).toBe("FAST");
+    expect(res.meta.providersUsed.map((u) => u.provider)).toEqual(["fast"]); // slow는 버려짐
+  });
+
+  it("가장 빠른 응답이 빈 결과면 다음으로 결과를 낸 응답을 기다린다", async () => {
+    const geo = createGeoWire({
+      providers: [
+        fakeProvider({ id: "fast-empty", delayMs: 5, search: [] }),
+        fakeProvider({ id: "slow-hit", delayMs: 40, search: [place({ providerPlaceId: "h", name: "HIT" })] }),
+      ],
+    });
+    const res = await geo.searchPlaces({ query: "x", options: { strategy: "fastest" } });
+    expect(res.results[0]!.name).toBe("HIT");
+    expect(res.meta.providersUsed.map((u) => u.provider)).toContain("slow-hit");
+  });
+});

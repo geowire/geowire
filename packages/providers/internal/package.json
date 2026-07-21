@@ -1,6 +1,6 @@
 {
   "name": "@geowirehq/provider-internal",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "GeoWire internal provider — customer's own places from CSV (in-memory search)",
   "license": "Apache-2.0",
   "type": "module",

@@ -12,6 +12,7 @@ import type { CircuitBreaker } from "../circuit-breaker.js";
 import type { ListRequest, OperationPlan, OperationSpec, ProviderInvocation } from "./types.js";
 import { firstSuccess } from "./strategies/first-success.js";
 import { mergeAll } from "./strategies/merge.js";
+import { fastest } from "./strategies/fastest.js";
 
 /** per-provider 기본 타임아웃 (설계 §7.1) */
 const DEFAULT_PROVIDER_TIMEOUT_MS = 3000;
@@ -114,7 +115,8 @@ async function invokeOne(
 
 /**
  * 계획된 공급자들을 전략에 따라 호출한다 (설계 §7.1 Execute).
- * - merge: 전부 병렬 호출.
+ * - merge: 전부 병렬 호출(후단 dedup).
+ * - fastest: 전부 병렬 호출, 결과를 가진 첫 응답에서 즉시 반환(나머지 버림).
  * - 그 외(first-success·cost-aware·weighted): 순차 호출·첫 결과에서 정지.
  *   순서는 plan 단계에서 전략별로 이미 정렬됨(cost 오름차순 / 가중 점수) → 여기선 실행만 동일.
  * 각 호출의 성공/실패는 ProviderInvocation으로 수집되어 meta 조립에 쓰인다.
@@ -132,7 +134,13 @@ export async function executeOperation(
   const invoke = (rp: RegisteredProvider): Promise<ProviderInvocation> =>
     invokeOne(rp, spec, deps);
 
-  return plan.strategy === "merge"
-    ? mergeAll(providers, invoke)
-    : firstSuccess(providers, invoke);
+  switch (plan.strategy) {
+    case "merge":
+      return mergeAll(providers, invoke);
+    case "fastest":
+      return fastest(providers, invoke);
+    default:
+      // first-success · cost-aware · weighted — 순서는 plan에서 정렬됨
+      return firstSuccess(providers, invoke);
+  }
 }

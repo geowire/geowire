@@ -45,6 +45,8 @@ export interface FakeProviderSpec {
   search?: ProviderPlace[] | (() => ProviderPlace[]);
   /** 지정 시 searchPlaces가 이 코드로 GeoProviderError를 던진다 */
   failWith?: ProviderErrorCode;
+  /** 응답 지연(ms) 시뮬레이션 — fastest 레이스 테스트용 */
+  delayMs?: number;
   /** 호출 지연(ms) 시뮬레이션용 카운터 훅 */
   onCall?: () => void;
 }
@@ -64,8 +66,9 @@ export function fakeProvider(spec: FakeProviderSpec): GeoProvider {
     coverage: spec.coverage,
   });
 
-  const run = (): ProviderPlace[] => {
+  const run = async (): Promise<ProviderPlace[]> => {
     spec.onCall?.();
+    if (spec.delayMs != null) await new Promise((r) => setTimeout(r, spec.delayMs));
     if (spec.failWith) {
       throw new GeoProviderError(spec.failWith, `${spec.id} failed with ${spec.failWith}`, {
         provider: spec.id,
@@ -79,7 +82,7 @@ export function fakeProvider(spec: FakeProviderSpec): GeoProvider {
   if (caps.includes("geocode")) impl.geocode = async () => run();
   if (caps.includes("reverseGeocode")) impl.reverseGeocode = async () => run();
   if (caps.includes("autocomplete")) impl.autocomplete = async () => run();
-  if (caps.includes("getPlace")) impl.getPlace = async () => run()[0] ?? null;
+  if (caps.includes("getPlace")) impl.getPlace = async () => (await run())[0] ?? null;
 
   return defineProvider(impl as Parameters<typeof defineProvider>[0]);
 }
