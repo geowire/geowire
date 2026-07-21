@@ -9,6 +9,8 @@ Works with **zero API keys** (OpenStreetMap). Enable more providers by adding an
 - Google: `"GOOGLE_MAPS_API_KEY": "..."`
 - Kakao (KR): `"KAKAO_REST_API_KEY": "..."`
 - Naver (KR): `"NAVER_CLIENT_ID": "...", "NAVER_CLIENT_SECRET": "..."`
+- Baidu (CN): `"BAIDU_MAP_AK": "..."`
+- Foursquare (global POI): `"FOURSQUARE_API_KEY": "..."`
 - Your own places: `"GEOWIRE_INTERNAL_CSV": "/path/to/places.csv"`
 
 ## Claude Desktop / Claude Code

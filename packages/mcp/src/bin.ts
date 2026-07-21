@@ -6,6 +6,8 @@ import { createGoogleProvider } from "@geowirehq/provider-google";
 import { createInternalProvider } from "@geowirehq/provider-internal";
 import { createKakaoProvider } from "@geowirehq/provider-kakao";
 import { createNaverProvider } from "@geowirehq/provider-naver";
+import { createBaiduProvider } from "@geowirehq/provider-baidu";
+import { createFoursquareProvider } from "@geowirehq/provider-foursquare";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createGeoWireMcpServer } from "./server.js";
 
@@ -34,6 +36,12 @@ async function main(): Promise<void> {
   const naverSecret = process.env.NAVER_CLIENT_SECRET;
   if (naverId && naverSecret)
     providers.push(createNaverProvider({ clientId: naverId, clientSecret: naverSecret }));
+
+  const baiduKey = process.env.BAIDU_MAP_AK;
+  if (baiduKey) providers.push(createBaiduProvider({ apiKey: baiduKey }));
+
+  const fsqKey = process.env.FOURSQUARE_API_KEY;
+  if (fsqKey) providers.push(createFoursquareProvider({ apiKey: fsqKey }));
 
   const config = loadConfig(process.env.GEOWIRE_CONFIG);
   const geo = createGeoWire({ providers, config, logger: stderrLogger });

@@ -29,6 +29,12 @@ importers:
       '@geowirehq/mcp':
         specifier: workspace:*
         version: link:../../packages/mcp
+      '@geowirehq/provider-baidu':
+        specifier: workspace:*
+        version: link:../../packages/providers/baidu
+      '@geowirehq/provider-foursquare':
+        specifier: workspace:*
+        version: link:../../packages/providers/foursquare
       '@geowirehq/provider-google':
         specifier: workspace:*
         version: link:../../packages/providers/google
@@ -146,6 +152,12 @@ importers:
       '@geowirehq/core':
         specifier: workspace:*
         version: link:../core
+      '@geowirehq/provider-baidu':
+        specifier: workspace:*
+        version: link:../providers/baidu
+      '@geowirehq/provider-foursquare':
+        specifier: workspace:*
+        version: link:../providers/foursquare
       '@geowirehq/provider-google':
         specifier: workspace:*
         version: link:../providers/google
@@ -212,6 +224,50 @@ importers:
         specifier: workspace:*
         version: link:../schema
     devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.1
+      typescript:
+        specifier: ^5.8.0
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.0
+        version: 3.2.7(@types/node@22.20.1)(yaml@2.9.0)
+
+  packages/providers/baidu:
+    dependencies:
+      '@geowirehq/provider-sdk':
+        specifier: workspace:*
+        version: link:../../provider-sdk
+      '@geowirehq/schema':
+        specifier: workspace:*
+        version: link:../../schema
+    devDependencies:
+      '@geowirehq/provider-testkit':
+        specifier: workspace:*
+        version: link:../../provider-testkit
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.1
+      typescript:
+        specifier: ^5.8.0
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.0
+        version: 3.2.7(@types/node@22.20.1)(yaml@2.9.0)
+
+  packages/providers/foursquare:
+    dependencies:
+      '@geowirehq/provider-sdk':
+        specifier: workspace:*
+        version: link:../../provider-sdk
+      '@geowirehq/schema':
+        specifier: workspace:*
+        version: link:../../schema
+    devDependencies:
+      '@geowirehq/provider-testkit':
+        specifier: workspace:*
+        version: link:../../provider-testkit
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.1

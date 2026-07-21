@@ -205,10 +205,14 @@ Keys come from the environment (`${VAR}`), never committed in plaintext.
 | `@geowirehq/provider-google` (Maps Platform) | BYOK | search, geocode, reverseGeocode, getPlace |
 | `@geowirehq/provider-kakao` (카카오맵, KR) | BYOK `KAKAO_REST_API_KEY` | search, geocode, reverseGeocode |
 | `@geowirehq/provider-naver` (네이버 지역검색, KR) | BYOK `NAVER_CLIENT_ID`+`NAVER_CLIENT_SECRET` | search, geocode |
+| `@geowirehq/provider-baidu` (百度地图, CN) | BYOK `BAIDU_MAP_AK` | search, geocode, reverseGeocode |
+| `@geowirehq/provider-foursquare` (global POI) | BYOK `FOURSQUARE_API_KEY` | search, getPlace |
 | `@geowirehq/provider-internal` (your CSV) | none | search |
 
-Kakao & Naver make Korea coverage first-class (where OSM is thin and Google has
-gaps) — merge all four + your own store data into one deduped record.
+Regional providers make Korea (Kakao/Naver) and China (Baidu) coverage
+first-class where OSM is thin and Google has gaps — Baidu returns BD-09
+coordinates, which GeoWire converts to WGS84 automatically. Merge them all +
+your own store data into one deduped record.
 
 Want another provider? See [CONTRIBUTING.md](./CONTRIBUTING.md) —
 *"Write a provider in 30 minutes"*.
@@ -234,7 +238,7 @@ v0.1 is deliberately "It works" scope. Honest about what's **not** in it yet:
 | Strategies | `first-success`, `merge`, `cost-aware`, `weighted`, **`fastest`** | — (all 5 shipped) |
 | Routing | explicit `country` | country **inference** from coordinates (v0.3) |
 | Cache | in-memory (LRU) | **Redis** adapter (v0.2) |
-| Providers | OSM, Google, **Kakao, Naver** (KR), your CSV | Mapbox, Foursquare, Baidu, … (community PRs welcome) |
+| Providers | OSM, Google, Kakao, Naver, **Baidu, Foursquare**, your CSV | Mapbox, HERE, TomTom, … (community PRs welcome) |
 | Rate limiting | per-provider (OSM 1 req/s) | global / per-endpoint |
 
 ## Architecture

@@ -1,7 +1,7 @@
 {
-  "name": "@geowirehq/provider-sdk",
+  "name": "@geowirehq/provider-foursquare",
   "version": "0.1.11",
-  "description": "GeoWire provider contract — the interface every geo provider implements",
+  "description": "GeoWire Foursquare Places provider — global POI search + details (BYOK)",
   "license": "Apache-2.0",
   "type": "module",
   "exports": {
@@ -20,9 +20,10 @@
   },
   "dependencies": {
     "@geowirehq/schema": "workspace:*",
-    "zod": "^4.0.0"
+    "@geowirehq/provider-sdk": "workspace:*"
   },
   "devDependencies": {
+    "@geowirehq/provider-testkit": "workspace:*",
     "@types/node": "^22.0.0",
     "typescript": "^5.8.0",
     "vitest": "^3.2.0"
