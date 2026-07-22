@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { runConformanceTests, jsonFetch, statusFetch, createTestContext } from "@geowirehq/provider-testkit";
+import { runConformanceTests, jsonFetch, statusFetch, createTestContext, mockJson } from "@geowirehq/provider-testkit";
 import { GeoProviderError } from "@geowirehq/provider-sdk";
 import { createGoogleProvider } from "../src/index.js";
 
@@ -46,7 +46,20 @@ const geocodeBody = {
   ],
 };
 
-const detailsBody = searchBody.places[0];
+// getPlace(Place Details)는 reviews를 추가로 반환한다(역할 소싱: 리뷰는 Google 권위).
+const detailsBody = {
+  ...searchBody.places[0],
+  reviews: [
+    {
+      rating: 5,
+      text: { text: "친절하고 깨끗해요", languageCode: "ko" },
+      authorAttribution: { displayName: "김철수" },
+      relativePublishTimeDescription: "2주 전",
+      publishTime: "2026-07-01T09:00:00Z",
+    },
+    { rating: 4, originalText: { text: "괜찮음" } },
+  ],
+};
 
 const provider = createGoogleProvider({ apiKey: "test-key" });
 
@@ -126,6 +139,41 @@ describe("createGoogleProvider — BYOK", () => {
     const ctx = createTestContext(jsonFetch(detailsBody));
     const place = await provider.getPlace!({ id: "ChIJgangnam1" }, ctx);
     expect(place?.providerPlaceId).toBe("ChIJgangnam1");
+  });
+
+  it("getPlace는 리뷰를 business.reviews로 파싱한다(역할 소싱: Google=리뷰)", async () => {
+    const ctx = createTestContext(jsonFetch(detailsBody));
+    const place = await provider.getPlace!({ id: "ChIJgangnam1" }, ctx);
+    const reviews = place?.business?.reviews;
+    expect(reviews).toHaveLength(2);
+    expect(reviews![0]).toMatchObject({
+      author: "김철수",
+      rating: 5,
+      text: "친절하고 깨끗해요",
+      relativeTime: "2주 전",
+      source: "google",
+    });
+    // text 없이 originalText만 있어도 파싱
+    expect(reviews![1]).toMatchObject({ rating: 4, text: "괜찮음", source: "google" });
+  });
+
+  it("getPlace는 reviews를 FieldMask에 포함한다(search는 비용상 제외)", async () => {
+    const masks: string[] = [];
+    const ctx = createTestContext((url, init) => {
+      masks.push(new Headers(init?.headers).get("X-Goog-FieldMask") ?? "");
+      return mockJson(detailsBody);
+    });
+    await provider.getPlace!({ id: "ChIJgangnam1" }, ctx);
+    expect(masks[0]).toContain("reviews");
+
+    // 대조: search FieldMask에는 reviews가 없다(Enterprise+Atmosphere SKU 회피)
+    const searchMasks: string[] = [];
+    const ctx2 = createTestContext((url, init) => {
+      searchMasks.push(new Headers(init?.headers).get("X-Goog-FieldMask") ?? "");
+      return mockJson(searchBody);
+    });
+    await provider.searchPlaces!({ query: "x", limit: 10 }, ctx2);
+    expect(searchMasks[0]).not.toContain("reviews");
   });
 
   it("HTTP 403은 AUTH_FAILED로 정규화한다", async () => {

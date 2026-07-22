@@ -1,6 +1,6 @@
 {
   "name": "@geowirehq/schema",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "GeoWire unified place schema — single source of truth (Zod v4, generates JSON Schema)",
   "license": "Apache-2.0",
   "type": "module",

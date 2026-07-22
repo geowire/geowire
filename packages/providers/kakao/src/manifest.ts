@@ -11,6 +11,8 @@ export const KAKAO_MANIFEST: ProviderManifest = {
   capabilities: ["search", "geocode", "reverseGeocode"],
   authType: "apiKey",
   coverage: ["KR"],
+  // 국가별 보완: 한국 현지 상호·주소가 권위 영역.
+  fieldAuthority: { name: 8, address: 7 },
   policy: {
     maxCacheTtlSeconds: 86_400,
     canStorePermanently: false,

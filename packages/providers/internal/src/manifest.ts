@@ -10,6 +10,8 @@ export const INTERNAL_MANIFEST: ProviderManifest = {
   name: "Internal (customer data)",
   capabilities: ["search"],
   authType: "none",
+  // 자체 데이터가 최우선 권위: 내 매장의 이름·연락처·영업정보는 내가 정본이다.
+  fieldAuthority: { name: 10, contact: 9, business: 8 },
   policy: {
     maxCacheTtlSeconds: 86_400,
     canStorePermanently: true,

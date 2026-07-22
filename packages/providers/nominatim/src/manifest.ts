@@ -9,6 +9,8 @@ export const NOMINATIM_MANIFEST: ProviderManifest = {
   name: "Nominatim (OpenStreetMap)",
   capabilities: ["search", "geocode", "reverseGeocode"],
   authType: "none",
+  // 기반 지도 데이터: 좌표·주소가 OSM의 권위 영역 (설계 §7.3 "좌표는 OSM").
+  fieldAuthority: { location: 10, address: 8 },
   policy: {
     maxCacheTtlSeconds: 86_400,
     canStorePermanently: true,

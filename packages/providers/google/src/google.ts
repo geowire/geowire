@@ -42,6 +42,13 @@ const PLACE_FIELDS = [
   "priceLevel",
 ];
 
+/**
+ * getPlace(Place Details) 전용 확장 필드. `reviews`는 Text Search에 붙이면
+ * Enterprise+Atmosphere SKU라 검색 비용이 급증하므로 상세 조회에만 요청한다
+ * (역할 기반 소싱: 리뷰는 Google이 권위 — search로 후보를 좁힌 뒤 상세에서 채운다).
+ */
+const DETAIL_FIELDS = [...PLACE_FIELDS, "reviews"];
+
 export interface GoogleOptions {
   /** Google Maps Platform API 키. 없으면 모든 호출이 MISSING_CREDENTIALS로 실패한다(BYOK) */
   apiKey?: string;
@@ -181,7 +188,7 @@ export function createGoogleProvider(options: GoogleOptions = {}): GeoProvider {
     async getPlace(req: GetPlaceRequest, ctx) {
       const json = (await placesFetch(
         `/places/${encodeURIComponent(req.id)}`,
-        { method: "GET", fieldMask: PLACE_FIELDS.join(",") },
+        { method: "GET", fieldMask: DETAIL_FIELDS.join(",") },
         ctx,
       )) as GooglePlace;
       return parseGooglePlace(json);

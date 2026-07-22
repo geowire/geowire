@@ -30,6 +30,9 @@ export const GOOGLE_MANIFEST: ProviderManifest = {
       reverseGeocode: 0.005,
     },
   },
+  // 리뷰·사진·평점·영업시간·전화가 Google의 권위 영역 (설계 §7.3 "영업시간은 Google").
+  // business에 rating/reviews/photos/openingHours가 묶여 있어 최고 가중.
+  fieldAuthority: { business: 10, contact: 7, address: 4 },
   policy: {
     maxCacheTtlSeconds: null,
     canStorePermanently: false,

@@ -1,6 +1,6 @@
 {
   "name": "@geowirehq/provider-naver",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "GeoWire Naver Local Search provider (네이버 지역검색) — Korea place search + geocode (BYOK)",
   "license": "Apache-2.0",
   "type": "module",

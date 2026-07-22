@@ -30,6 +30,7 @@ export function manifest(over: Partial<ProviderManifest> & { id: string }): Prov
   if (over.coverage) m.coverage = over.coverage;
   if (over.cost) m.cost = over.cost;
   if (over.rateLimit) m.rateLimit = over.rateLimit;
+  if (over.fieldAuthority) m.fieldAuthority = over.fieldAuthority;
   return m;
 }
 
@@ -41,6 +42,8 @@ export interface FakeProviderSpec {
   policy?: ProviderManifest["policy"];
   cost?: ProviderManifest["cost"];
   coverage?: ProviderManifest["coverage"];
+  /** 역할 기반 필드 소싱 선언 (필드별 권위 가중) */
+  fieldAuthority?: ProviderManifest["fieldAuthority"];
   /** 고정 검색 결과. 함수면 요청마다 계산 */
   search?: ProviderPlace[] | (() => ProviderPlace[]);
   /** 지정 시 searchPlaces가 이 코드로 GeoProviderError를 던진다 */
@@ -64,6 +67,7 @@ export function fakeProvider(spec: FakeProviderSpec): GeoProvider {
     policy: spec.policy,
     cost: spec.cost,
     coverage: spec.coverage,
+    fieldAuthority: spec.fieldAuthority,
   });
 
   const run = async (): Promise<ProviderPlace[]> => {

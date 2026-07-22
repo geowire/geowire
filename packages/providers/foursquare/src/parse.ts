@@ -1,6 +1,12 @@
 import { CountryCode } from "@geowirehq/schema";
-import type { Address, Contact } from "@geowirehq/schema";
+import type { Address, Business, Contact } from "@geowirehq/schema";
 import type { ProviderPlace } from "@geowirehq/provider-sdk";
+
+/** Foursquare 사진 리소스 — 공개 CDN(prefix + 크기 + suffix). 키 불필요. */
+interface FsqPhoto {
+  prefix?: string;
+  suffix?: string;
+}
 
 /** Foursquare Places(현행 API) place (관심 필드만) */
 export interface FsqPlace {
@@ -19,6 +25,15 @@ export interface FsqPlace {
   categories?: Array<{ name?: string }>;
   tel?: string;
   website?: string;
+  rating?: number; // 0~10 스케일 (현행 API)
+  price?: number; // 1(저렴)~4(고가)
+  photos?: FsqPhoto[];
+}
+
+/** Foursquare 사진 객체 → 원본 크기 공개 URL. prefix/suffix 없으면 null. */
+function fsqPhotoUrl(p: FsqPhoto): string | null {
+  if (!p.prefix || !p.suffix) return null;
+  return `${p.prefix}original${p.suffix}`;
 }
 
 /** place → ProviderPlace. 좌표·id·이름 없으면 null. */
@@ -56,6 +71,14 @@ export function parseFsqPlace(raw: FsqPlace): ProviderPlace | null {
   if (raw.tel) contact.phone = raw.tel;
   if (raw.website) contact.website = raw.website;
   if (Object.keys(contact).length > 0) place.contact = contact;
+
+  // 역할 소싱(POI 전문): 평점(0~10→0~5)·가격대·사진(공개 CDN URL).
+  const business: Business = {};
+  if (typeof raw.rating === "number") business.rating = Math.max(0, Math.min(5, raw.rating / 2));
+  if (typeof raw.price === "number") business.priceLevel = Math.max(0, Math.min(4, Math.round(raw.price)));
+  const photos = (raw.photos ?? []).map(fsqPhotoUrl).filter((u): u is string => u !== null);
+  if (photos.length > 0) business.photos = photos;
+  if (Object.keys(business).length > 0) place.business = business;
 
   return place;
 }

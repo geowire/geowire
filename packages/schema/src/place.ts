@@ -53,6 +53,24 @@ export const Contact = z.object({
 });
 export type Contact = z.infer<typeof Contact>;
 
+/**
+ * 개별 리뷰 (역할 기반 소싱: 리뷰는 Google이 권위 소스).
+ * 원본 텍스트는 공급자 약관상 캐시 불가일 수 있어 Policy Engine의
+ * `canStorePermanently`가 저장 여부를 강제한다(Google 원본 = 저장 금지).
+ */
+export const Review = z.object({
+  author: z.string().optional(),
+  /** 0.0~5.0 정규화 */
+  rating: z.number().min(0).max(5).optional(),
+  text: z.string().optional(),
+  /** 사람이 읽는 상대 시각 (예: "2주 전") — 공급자 원문 */
+  relativeTime: z.string().optional(),
+  time: z.iso.datetime().optional(),
+  /** 리뷰 출처 공급자 id (예: "google") — 병합 시 혼선 방지 */
+  source: z.string().optional(),
+});
+export type Review = z.infer<typeof Review>;
+
 export const Business = z.object({
   /** OSM opening_hours 포맷 (예: "Mo-Su 00:00-24:00") */
   openingHours: z.string().optional(),
@@ -61,6 +79,10 @@ export const Business = z.object({
   /** 0.0~5.0 정규화. 공급자별 스케일은 어댑터가 변환 */
   rating: z.number().min(0).max(5).optional(),
   reviewCount: z.number().int().nonnegative().optional(),
+  /** 대표 리뷰 표본 (역할 소싱: Google). 원본이라 캐시는 Policy Engine이 통제 */
+  reviews: z.array(Review).optional(),
+  /** 사진 URL (역할 소싱: Foursquare 등 공개 CDN URL) */
+  photos: z.array(z.url()).optional(),
 });
 export type Business = z.infer<typeof Business>;
 

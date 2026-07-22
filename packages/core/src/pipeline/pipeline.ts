@@ -137,6 +137,11 @@ export async function runOperation(
     const res = dedup(inRadius, {
       mergeThreshold: host.config.dedup.mergeThreshold,
       providerRank: (id) => host.registry.get(id)?.priority ?? 0,
+      // 역할 기반 필드 소싱: 각 공급자가 manifest에 선언한 필드 권위를 병합에 주입한다.
+      fieldAuthority: (id, field) => {
+        const authority = host.registry.get(id)?.provider.manifest.fieldAuthority;
+        return authority ? (authority as Record<string, number>)[field] : undefined;
+      },
     });
     working = res.merged;
     dedupMeta = { before: res.before, after: res.after };

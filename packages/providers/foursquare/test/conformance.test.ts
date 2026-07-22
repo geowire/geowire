@@ -18,6 +18,12 @@ const detail = {
   categories: [{ name: "Café" }, { name: "Coffee Shop" }],
   tel: "(510) 653-3394",
   website: "https://bluebottlecoffee.com",
+  rating: 9.0, // 0~10 스케일 → 4.5로 정규화
+  price: 2,
+  photos: [
+    { prefix: "https://fastly.4sqi.net/img/general/", suffix: "/12345_abc.jpg", width: 1920, height: 1440 },
+    { prefix: "https://fastly.4sqi.net/img/general/", suffix: "/67890_def.jpg" },
+  ],
 };
 
 const searchBody = { results: [detail] };
@@ -92,5 +98,17 @@ describe("createFoursquareProvider — BYOK", () => {
     const p = await provider.getPlace!({ id: "fsq_abc123" }, ctx);
     expect(p?.name).toBe("Blue Bottle Coffee");
     expect(p?.contact?.website).toBe("https://bluebottlecoffee.com");
+  });
+
+  it("평점(0~10→0~5)·가격대·사진을 business로 파싱한다(역할 소싱: POI 전문)", async () => {
+    const ctx = createTestContext(jsonFetch(detail));
+    const p = await provider.getPlace!({ id: "fsq_abc123" }, ctx);
+    expect(p?.business?.rating).toBe(4.5); // 9.0/2
+    expect(p?.business?.priceLevel).toBe(2);
+    // prefix+original+suffix로 조립된 공개 CDN URL(키 불필요)
+    expect(p?.business?.photos).toEqual([
+      "https://fastly.4sqi.net/img/general/original/12345_abc.jpg",
+      "https://fastly.4sqi.net/img/general/original/67890_def.jpg",
+    ]);
   });
 });

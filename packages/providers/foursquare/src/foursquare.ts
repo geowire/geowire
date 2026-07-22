@@ -12,7 +12,8 @@ import { parseFsqPlace, parseFsqPlaces, type FsqPlace } from "./parse.js";
 const DEFAULT_BASE_URL = "https://places-api.foursquare.com";
 const DEFAULT_API_VERSION = "2025-06-17";
 const MAX_RADIUS_M = 100_000;
-const FIELDS = "fsq_place_id,name,latitude,longitude,location,categories,tel,website";
+const FIELDS =
+  "fsq_place_id,name,latitude,longitude,location,categories,tel,website,rating,price,photos";
 
 export interface FoursquareOptions {
   /** Foursquare Service API key (Bearer). 없으면 MISSING_CREDENTIALS (BYOK) */

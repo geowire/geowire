@@ -11,6 +11,8 @@ export const FOURSQUARE_MANIFEST: ProviderManifest = {
   name: "Foursquare Places",
   capabilities: ["search", "getPlace"],
   authType: "apiKey",
+  // POI 전문: 카테고리(합집합 병합)와 사진·속성이 강점. Google 부재 시 business 대체원.
+  fieldAuthority: { business: 6, contact: 5 },
   policy: {
     maxCacheTtlSeconds: 86_400,
     canStorePermanently: false,

@@ -2,6 +2,7 @@ export {
   LatLng,
   Address,
   Contact,
+  Review,
   Business,
   PlaceSource,
   Place,
@@ -10,7 +11,7 @@ export {
 } from "./place.js";
 export { ProviderErrorCode } from "./errors.js";
 export { CountryCode } from "./country.js";
-export { Capability, ProviderManifest } from "./manifest.js";
+export { Capability, FieldRole, ProviderManifest } from "./manifest.js";
 export {
   Strategy,
   RequestOptions,

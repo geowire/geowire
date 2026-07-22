@@ -214,6 +214,27 @@ first-class where OSM is thin and Google has gaps — Baidu returns BD-09
 coordinates, which GeoWire converts to WGS84 automatically. Merge them all +
 your own store data into one deduped record.
 
+### Provider roles — each provider does what it's best at
+
+Providers aren't interchangeable; they're **complementary**. When `merge` combines
+duplicates, GeoWire doesn't just pick the highest-priority provider's whole record —
+it sources **each field from the provider that's authoritative for it**. Every
+provider declares its strengths in its manifest (`fieldAuthority`), so one merged
+place can carry OSM's coordinates, Google's reviews, and Kakao's local name at once:
+
+| Provider | Authoritative for | Role |
+|---|---|---|
+| Nominatim / OSM | `location`, `address` | base map geometry & addresses |
+| Google | `business` (rating, hours, **reviews**), `contact` | rich business data |
+| Foursquare | `business` (**photos**, price), categories | global POI specialist |
+| Kakao / Naver / Baidu | `name`, `address` | country-specific local names |
+| Internal (your CSV) | `name`, `contact`, `business` | your own data is the source of truth |
+
+`sources[].fields` in every response records which provider contributed which field.
+This is the "Stripe for Maps" idea in code: you get one clean place record, and each
+part of it comes from whoever knows it best. (Reviews/photos are provider originals —
+the policy engine enforces each provider's storage terms; Google originals aren't cached.)
+
 Want another provider? See [CONTRIBUTING.md](./CONTRIBUTING.md) —
 *"Write a provider in 30 minutes"*.
 
