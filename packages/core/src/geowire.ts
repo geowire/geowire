@@ -7,6 +7,10 @@ import {
   ReverseGeocodeRequest,
   GetPlaceRequest,
   SearchPlacesResponse,
+  RouteRequest,
+  RouteResponse,
+  DistanceMatrixRequest,
+  DistanceMatrixResponse,
   Place,
 } from "@geowirehq/schema";
 import { GeoWireConfig, defaultConfig } from "./config/schema.js";
@@ -15,6 +19,7 @@ import { collectConfigWarnings } from "./config/warnings.js";
 import { ProviderRegistry } from "./registry.js";
 import { runOperation } from "./pipeline/pipeline.js";
 import { runGetPlace } from "./pipeline/get-place.js";
+import { runRoute, runDistanceMatrix } from "./pipeline/routing.js";
 import { resolveCountry } from "./pipeline/normalize-request.js";
 import type { OperationSpec } from "./pipeline/types.js";
 import { MemoryCache } from "./cache/memory.js";
@@ -141,6 +146,26 @@ export class GeoWire {
     const req = GetPlaceRequest.parse(input);
     const place = await runGetPlace(this, req);
     return place ? Place.parse(place) : null;
+  }
+
+  /**
+   * 길찾기 (설계: routing/v1). 경유지 간 경로를 route capable 공급자에서 first-success로 얻는다.
+   * 무키 OSRM이 기본. 응답도 `RouteResponse`로 자기 검증한다.
+   */
+  async getRoute(input: unknown): Promise<RouteResponse> {
+    const req = RouteRequest.parse(input);
+    const { routes, meta } = await runRoute(this, req);
+    return RouteResponse.parse({ routes, meta });
+  }
+
+  /** 거리/시간 행렬. origins×destinations를 distanceMatrix capable 공급자에서 계산한다. */
+  async getDistanceMatrix(input: unknown): Promise<DistanceMatrixResponse> {
+    const req = DistanceMatrixRequest.parse(input);
+    const { matrix, meta } = await runDistanceMatrix(this, req);
+    if (!matrix) {
+      throw new Error("사용 가능한 distanceMatrix 공급자가 없습니다 (OSRM 등록 필요)");
+    }
+    return DistanceMatrixResponse.parse({ matrix, meta });
   }
 
   /** 활성/비활성 공급자 요약. list_geo_providers·/v1/providers의 데이터원 */

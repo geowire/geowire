@@ -6,9 +6,16 @@ import type {
   ReverseGeocodeRequest,
   GetPlaceRequest,
   AutocompleteRequest,
+  RouteRequest,
+  DistanceMatrixRequest,
 } from "@geowirehq/schema";
 import type { ProviderContext } from "./context.js";
-import type { ProviderHealth, ProviderPlace } from "./types.js";
+import type {
+  ProviderHealth,
+  ProviderPlace,
+  ProviderRoute,
+  ProviderDistanceMatrix,
+} from "./types.js";
 
 /**
  * 모든 GeoWire 공급자가 구현하는 계약.
@@ -34,6 +41,14 @@ export interface GeoProvider {
     ctx: ProviderContext,
   ): Promise<ProviderPlace[]>;
 
+  /** 경유지 간 길찾기. 결과 없으면 빈 배열(폴백 유도) */
+  route?(req: RouteRequest, ctx: ProviderContext): Promise<ProviderRoute[]>;
+  /** 원점×목적지 거리/시간 행렬 */
+  distanceMatrix?(
+    req: DistanceMatrixRequest,
+    ctx: ProviderContext,
+  ): Promise<ProviderDistanceMatrix>;
+
   /** 선택적 상태 점검. 없으면 registry가 가벼운 기본 점검을 쓴다 */
   healthCheck?(ctx: ProviderContext): Promise<ProviderHealth>;
 }
@@ -45,4 +60,6 @@ export const CAPABILITY_METHOD: Record<Capability, keyof GeoProvider> = {
   reverseGeocode: "reverseGeocode",
   getPlace: "getPlace",
   autocomplete: "autocomplete",
+  route: "route",
+  distanceMatrix: "distanceMatrix",
 };

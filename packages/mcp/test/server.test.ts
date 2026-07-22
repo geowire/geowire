@@ -4,6 +4,7 @@ import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createGeoWire, type GeoWire } from "@geowirehq/core";
 import { createNominatimProvider } from "@geowirehq/provider-nominatim";
 import { createGoogleProvider } from "@geowirehq/provider-google";
+import { createOsrmProvider } from "@geowirehq/provider-osrm";
 import { createGeoWireMcpServer } from "../src/server.js";
 import { TOOL_DEFS } from "../src/tools.js";
 
@@ -37,13 +38,21 @@ function routedFetch(): (url: string) => Promise<Response> {
     if (url.includes(":searchText")) return json({ places: [GOOGLE_DETAILS] });
     if (url.includes("/places/")) return json(GOOGLE_DETAILS);
     if (url.includes("maps.googleapis")) return json({ status: "OK", results: [] });
+    if (url.includes("/route/v1/"))
+      return json({
+        code: "Ok",
+        routes: [{ distance: 9949.4, duration: 598.4, legs: [{ distance: 9949.4, duration: 598.4 }] }],
+      });
     if (url.includes("nominatim")) return json(NOMI);
     return json({});
   };
 }
 
 function buildGeo(opts: { google?: boolean } = {}): GeoWire {
-  const providers = [createNominatimProvider({ sleep: async () => {} })];
+  const providers = [
+    createNominatimProvider({ sleep: async () => {} }),
+    createOsrmProvider(),
+  ];
   if (opts.google) providers.push(createGoogleProvider({ apiKey: "test-key" }));
   return createGeoWire({
     providers,
@@ -62,11 +71,13 @@ async function connectClient(geo: GeoWire): Promise<Client> {
 }
 
 describe("GeoWire MCP 서버 — 도구 목록", () => {
-  it("5개 도구를 노출한다", async () => {
+  it("7개 도구를 노출한다", async () => {
     const client = await connectClient(buildGeo());
     const { tools } = await client.listTools();
     expect(tools.map((t) => t.name).sort()).toEqual([
+      "distance_matrix",
       "geocode_address",
+      "get_directions",
       "get_place",
       "list_geo_providers",
       "reverse_geocode",
@@ -129,11 +140,29 @@ describe("GeoWire MCP 서버 — 도구 호출 (5개 전부)", () => {
     expect(structured.place?.name).toBe("GS25 강남점");
   });
 
+  it("get_directions: 경유지 길찾기 (osrm, 무키)", async () => {
+    const client = await connectClient(buildGeo());
+    const res = await client.callTool({
+      name: "get_directions",
+      arguments: {
+        waypoints: [
+          { latitude: 37.5665, longitude: 126.978 },
+          { latitude: 37.4979, longitude: 127.0276 },
+        ],
+      },
+    });
+    const content = res.content as Array<{ type: string; text: string }>;
+    expect(content[0]!.text).toContain("Route:");
+    const structured = res.structuredContent as { routes: Array<{ provider: string; distanceMeters: number }> };
+    expect(structured.routes[0]!.provider).toBe("osrm");
+    expect(structured.routes[0]!.distanceMeters).toBe(9949.4);
+  });
+
   it("list_geo_providers: 활성 공급자 목록", async () => {
     const client = await connectClient(buildGeo({ google: true }));
     const res = await client.callTool({ name: "list_geo_providers", arguments: {} });
     const structured = res.structuredContent as { providers: Array<{ id: string }> };
-    expect(structured.providers.map((p) => p.id).sort()).toEqual(["google", "nominatim"]);
+    expect(structured.providers.map((p) => p.id).sort()).toEqual(["google", "nominatim", "osrm"]);
   });
 });
 
@@ -155,7 +184,7 @@ describe("GeoWire MCP 서버 — 에러 처리", () => {
   });
 });
 
-describe("Zero-config (키 없는 nominatim-only) — DoD", () => {
+describe("Zero-config (키 없는 nominatim + osrm) — DoD", () => {
   it("Google 키 없이도 search_places가 동작한다", async () => {
     const client = await connectClient(buildGeo()); // google 없음
     const res = await client.callTool({ name: "search_places", arguments: { query: "서울시청" } });
@@ -164,10 +193,10 @@ describe("Zero-config (키 없는 nominatim-only) — DoD", () => {
     expect(structured.meta.providersUsed[0]!.provider).toBe("nominatim");
   });
 
-  it("list_geo_providers가 nominatim만 보고한다", async () => {
+  it("list_geo_providers가 무키 기본(nominatim 검색 + osrm 길찾기)을 보고한다", async () => {
     const client = await connectClient(buildGeo());
     const res = await client.callTool({ name: "list_geo_providers", arguments: {} });
     const structured = res.structuredContent as { providers: Array<{ id: string }> };
-    expect(structured.providers.map((p) => p.id)).toEqual(["nominatim"]);
+    expect(structured.providers.map((p) => p.id).sort()).toEqual(["nominatim", "osrm"]);
   });
 });

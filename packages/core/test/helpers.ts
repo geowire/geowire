@@ -1,7 +1,7 @@
 import { defineProvider, GeoProviderError } from "@geowirehq/provider-sdk";
 import type { GeoProvider, ProviderContext } from "@geowirehq/provider-sdk";
 import type { ProviderManifest, ProviderErrorCode } from "@geowirehq/schema";
-import type { ProviderPlace } from "@geowirehq/provider-sdk";
+import type { ProviderPlace, ProviderRoute, ProviderDistanceMatrix } from "@geowirehq/provider-sdk";
 
 /** 테스트용 최소 ProviderContext */
 export function testContext(overrides: Partial<ProviderContext> = {}): ProviderContext {
@@ -46,6 +46,10 @@ export interface FakeProviderSpec {
   fieldAuthority?: ProviderManifest["fieldAuthority"];
   /** 고정 검색 결과. 함수면 요청마다 계산 */
   search?: ProviderPlace[] | (() => ProviderPlace[]);
+  /** route capability가 반환할 ProviderRoute 배열 */
+  routeResult?: ProviderRoute[];
+  /** distanceMatrix capability가 반환할 ProviderDistanceMatrix */
+  matrixResult?: ProviderDistanceMatrix;
   /** 지정 시 searchPlaces가 이 코드로 GeoProviderError를 던진다 */
   failWith?: ProviderErrorCode;
   /** 응답 지연(ms) 시뮬레이션 — fastest 레이스 테스트용 */
@@ -87,6 +91,22 @@ export function fakeProvider(spec: FakeProviderSpec): GeoProvider {
   if (caps.includes("reverseGeocode")) impl.reverseGeocode = async () => run();
   if (caps.includes("autocomplete")) impl.autocomplete = async () => run();
   if (caps.includes("getPlace")) impl.getPlace = async () => (await run())[0] ?? null;
+  if (caps.includes("route"))
+    impl.route = async () => {
+      spec.onCall?.();
+      if (spec.failWith) {
+        throw new GeoProviderError(spec.failWith, `${spec.id} failed`, { provider: spec.id });
+      }
+      return spec.routeResult ?? [];
+    };
+  if (caps.includes("distanceMatrix"))
+    impl.distanceMatrix = async () => {
+      spec.onCall?.();
+      if (spec.failWith) {
+        throw new GeoProviderError(spec.failWith, `${spec.id} failed`, { provider: spec.id });
+      }
+      return spec.matrixResult ?? { rows: [] };
+    };
 
   return defineProvider(impl as Parameters<typeof defineProvider>[0]);
 }

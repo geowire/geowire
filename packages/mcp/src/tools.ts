@@ -4,11 +4,19 @@ import {
   GeocodeRequest,
   ReverseGeocodeRequest,
   GetPlaceRequest,
+  RouteRequest,
+  DistanceMatrixRequest,
 } from "@geowirehq/schema";
 import type { GeoWire } from "@geowirehq/core";
 import { GeoProviderError } from "@geowirehq/provider-sdk";
 import type { CallToolResult, Tool } from "@modelcontextprotocol/sdk/types.js";
-import { formatResults, formatSinglePlace, formatProviders } from "./format.js";
+import {
+  formatResults,
+  formatSinglePlace,
+  formatProviders,
+  formatRoutes,
+  formatMatrix,
+} from "./format.js";
 
 /**
  * Zod 스키마를 MCP inputSchema(JSON Schema)로 변환한다 (설계 §9.1 "수기 금지, 자동 생성").
@@ -78,6 +86,27 @@ export const TOOL_DEFS: Tool[] = [
     inputSchema: toInputSchema(ReverseGeocodeRequest),
   },
   {
+    name: "get_directions",
+    description:
+      "Get a route (driving directions) between two or more waypoints, with total distance, travel time, " +
+      "and per-leg breakdown. Works with no API key (OpenStreetMap routing via OSRM). Use this for " +
+      "'how do I get from A to B', 'how far by car', or 'how long to drive' questions. Waypoints are " +
+      "{latitude, longitude} in order (start, [via...], end). " +
+      'Example: {"waypoints": [{"latitude": 37.5665, "longitude": 126.9780}, {"latitude": 37.4979, "longitude": 127.0276}]}. ' +
+      "Set geometry:true to also get the route polyline. Note: the public OSRM server supports driving only.",
+    inputSchema: toInputSchema(RouteRequest),
+  },
+  {
+    name: "distance_matrix",
+    description:
+      "Compute a matrix of travel distances and times from each origin to each destination (N origins × M " +
+      "destinations) in one call. No API key needed. Use this to rank/compare many candidates by drive time — " +
+      "e.g. 'which of these 5 stores is closest to the customer' or delivery/logistics assignment. " +
+      'Example: {"origins": [{"latitude": 37.57, "longitude": 126.98}], "destinations": [{"latitude": 37.49, "longitude": 127.02}, {"latitude": 37.51, "longitude": 127.05}]}. ' +
+      "rows[i][j] is origins[i] → destinations[j]. Public OSRM supports driving only.",
+    inputSchema: toInputSchema(DistanceMatrixRequest),
+  },
+  {
     name: "list_geo_providers",
     description:
       "List the geo data providers currently configured, with their capabilities, enabled state, priority, " +
@@ -132,6 +161,14 @@ export async function dispatchTool(
         const parsed = GetPlaceRequest.parse(args);
         const place = await geo.getPlace(parsed);
         return textResult(formatSinglePlace(place, parsed.id), { place });
+      }
+      case "get_directions": {
+        const res = await geo.getRoute(args);
+        return textResult(formatRoutes(res.routes, res.meta), res);
+      }
+      case "distance_matrix": {
+        const res = await geo.getDistanceMatrix(args);
+        return textResult(formatMatrix(res.matrix, res.meta), res);
       }
       case "list_geo_providers": {
         const providers = geo.listProviders();

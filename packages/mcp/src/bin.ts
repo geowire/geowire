@@ -8,6 +8,7 @@ import { createKakaoProvider } from "@geowirehq/provider-kakao";
 import { createNaverProvider } from "@geowirehq/provider-naver";
 import { createBaiduProvider } from "@geowirehq/provider-baidu";
 import { createFoursquareProvider } from "@geowirehq/provider-foursquare";
+import { createOsrmProvider } from "@geowirehq/provider-osrm";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createGeoWireMcpServer } from "./server.js";
 
@@ -20,8 +21,11 @@ const stderrLogger: Logger = {
 };
 
 async function main(): Promise<void> {
-  // Zero-config: nominatim은 키 없이 항상 활성. 나머지는 환경 변수로 opt-in.
-  const providers: GeoProvider[] = [createNominatimProvider()];
+  // Zero-config: nominatim(검색)·osrm(길찾기)은 키 없이 항상 활성. 나머지는 환경 변수로 opt-in.
+  const providers: GeoProvider[] = [
+    createNominatimProvider(),
+    createOsrmProvider({ baseUrl: process.env.OSRM_BASE_URL }),
+  ];
 
   const googleKey = process.env.GOOGLE_MAPS_API_KEY;
   if (googleKey) providers.push(createGoogleProvider({ apiKey: googleKey }));

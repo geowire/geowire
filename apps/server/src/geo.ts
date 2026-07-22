@@ -7,10 +7,12 @@ import { createKakaoProvider } from "@geowirehq/provider-kakao";
 import { createNaverProvider } from "@geowirehq/provider-naver";
 import { createBaiduProvider } from "@geowirehq/provider-baidu";
 import { createFoursquareProvider } from "@geowirehq/provider-foursquare";
+import { createOsrmProvider } from "@geowirehq/provider-osrm";
 
 /**
  * 환경 변수로 GeoWire 인스턴스를 구성한다 (설계 §8.1 Zero-config + BYOK).
- * - nominatim: 항상 활성(키 불필요)
+ * - nominatim: 항상 활성(키 불필요) — 검색·지오코딩
+ * - osrm: 항상 활성(키 불필요) — 길찾기·거리행렬. `OSRM_BASE_URL`로 self-host 지정 가능
  * - google: `GOOGLE_MAPS_API_KEY` 있으면 추가
  * - kakao: `KAKAO_REST_API_KEY` 있으면 추가 (한국)
  * - naver: `NAVER_CLIENT_ID` + `NAVER_CLIENT_SECRET` 있으면 추가 (한국)
@@ -20,7 +22,11 @@ import { createFoursquareProvider } from "@geowirehq/provider-foursquare";
  * - config: `GEOWIRE_CONFIG`(YAML 경로) 있으면 로드, 없으면 zero-config 기본값
  */
 export function createGeoFromEnv(logger?: Logger): GeoWire {
-  const providers: GeoProvider[] = [createNominatimProvider()];
+  // nominatim(검색)·osrm(길찾기) 둘 다 무키 기본. OSRM_BASE_URL로 self-host 오버라이드.
+  const providers: GeoProvider[] = [
+    createNominatimProvider(),
+    createOsrmProvider({ baseUrl: process.env.OSRM_BASE_URL }),
+  ];
 
   const googleKey = process.env.GOOGLE_MAPS_API_KEY;
   if (googleKey) providers.push(createGoogleProvider({ apiKey: googleKey }));

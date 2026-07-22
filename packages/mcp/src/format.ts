@@ -1,5 +1,20 @@
-import type { Place, ResponseMeta } from "@geowirehq/schema";
+import type { Place, ResponseMeta, Route, DistanceMatrix } from "@geowirehq/schema";
 import type { ProviderInfo } from "@geowirehq/core";
+
+/** 초 → 사람이 읽는 시간 (예: "1h 12m", "8m", "45s") */
+function humanDuration(seconds: number): string {
+  const s = Math.round(seconds);
+  if (s < 60) return `${s}s`;
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  return `${h}h ${m % 60}m`;
+}
+
+/** 미터 → 사람이 읽는 거리 (예: "12.4 km", "850 m") */
+function humanDistance(meters: number): string {
+  return meters >= 1000 ? `${(meters / 1000).toFixed(1)} km` : `${Math.round(meters)} m`;
+}
 
 /** 좌표를 소수점 5자리로 (약 1m 정밀도) */
 function coord(n: number): string {
@@ -57,6 +72,38 @@ export function formatSinglePlace(place: Place | null, id: string): string {
   }
   const attribution = place.attributions.length ? `\nAttribution: ${place.attributions.join("; ")}` : "";
   return `${formatPlace(place)}${attribution}`;
+}
+
+/** 길찾기 결과 텍스트 */
+export function formatRoutes(routes: Route[], meta: ResponseMeta): string {
+  if (routes.length === 0) {
+    return `No route found.\n\n${formatMeta(meta)}`;
+  }
+  const lines = routes.map((r, i) => {
+    const label = routes.length > 1 ? `Route ${i + 1}: ` : "Route: ";
+    const legs =
+      r.legs.length > 1
+        ? `\n   legs: ${r.legs.map((l) => `${humanDistance(l.distanceMeters)}/${humanDuration(l.durationSeconds)}`).join(" → ")}`
+        : "";
+    return `${label}${humanDistance(r.distanceMeters)}, ${humanDuration(r.durationSeconds)} (${r.provider})${legs}`;
+  });
+  const attribution = meta.attributions.length ? `\nAttribution: ${meta.attributions.join("; ")}` : "";
+  return `${lines.join("\n")}\n\n${formatMeta(meta)}${attribution}`.trim();
+}
+
+/** 거리 행렬 텍스트 (작은 행렬은 표, 큰 건 요약) */
+export function formatMatrix(matrix: DistanceMatrix, meta: ResponseMeta): string {
+  const rows = matrix.rows.map((row, i) => {
+    const cells = row.map((c, j) => {
+      if (c.durationSeconds == null && c.distanceMeters == null) return `[${i}][${j}] —`;
+      const dist = c.distanceMeters != null ? humanDistance(c.distanceMeters) : "?";
+      const dur = c.durationSeconds != null ? humanDuration(c.durationSeconds) : "?";
+      return `[${i}→${j}] ${dist}/${dur}`;
+    });
+    return cells.join("  ");
+  });
+  const attribution = meta.attributions.length ? `\nAttribution: ${meta.attributions.join("; ")}` : "";
+  return `Distance matrix (${matrix.rows.length}×${matrix.rows[0]?.length ?? 0}, ${matrix.provider}):\n${rows.join("\n")}\n\n${formatMeta(meta)}${attribution}`.trim();
 }
 
 /** list_geo_providers 텍스트 */

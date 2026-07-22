@@ -8,6 +8,8 @@ export const Capability = z.enum([
   "geocode",
   "reverseGeocode",
   "getPlace",
+  "route",
+  "distanceMatrix",
 ]);
 export type Capability = z.infer<typeof Capability>;
 

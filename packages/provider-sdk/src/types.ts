@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Place } from "@geowirehq/schema";
+import { Place, Route, DistanceMatrix } from "@geowirehq/schema";
 
 /**
  * 공급자가 반환하는 정규화된 장소 — `Place`에서 **core의 책임인 필드를 제거**한 형태다.
@@ -21,6 +21,20 @@ export const ProviderPlace = Place.omit({
   confidence: z.number().min(0).max(1).optional(),
 });
 export type ProviderPlace = z.infer<typeof ProviderPlace>;
+
+/**
+ * 공급자가 반환하는 경로 — `Route`에서 core가 채우는 `provider`·`attributions`를 제거한 형태.
+ * `Route`에서 파생하므로 스키마 변경이 자동 반영된다(단일 진실원).
+ */
+export const ProviderRoute = Route.omit({ provider: true, attributions: true });
+export type ProviderRoute = z.infer<typeof ProviderRoute>;
+
+/** 공급자가 반환하는 거리 행렬 — `provider`·`attributions`는 core가 주입 */
+export const ProviderDistanceMatrix = DistanceMatrix.omit({
+  provider: true,
+  attributions: true,
+});
+export type ProviderDistanceMatrix = z.infer<typeof ProviderDistanceMatrix>;
 
 /** 공급자 상태 점검 결과 (registry의 서킷브레이커·`/v1/providers` 노출용) */
 export interface ProviderHealth {

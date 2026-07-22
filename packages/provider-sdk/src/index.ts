@@ -1,5 +1,5 @@
 export { GeoProviderError, errorFromHttpStatus, isRetryableCode } from "./errors.js";
-export { ProviderPlace } from "./types.js";
+export { ProviderPlace, ProviderRoute, ProviderDistanceMatrix } from "./types.js";
 export type { ProviderHealth } from "./types.js";
 export type { GeoProvider } from "./provider.js";
 export { CAPABILITY_METHOD } from "./provider.js";

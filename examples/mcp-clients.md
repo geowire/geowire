@@ -1,8 +1,10 @@
 # Connect GeoWire to any MCP client
 
 GeoWire is a standard MCP server over **stdio** (`npx -y @geowirehq/mcp`) or
-**HTTP** (`POST http://localhost:4980/mcp`). It exposes 5 tools: `search_places`,
-`geocode_address`, `reverse_geocode`, `get_place`, `list_geo_providers`.
+**HTTP** (`POST http://localhost:4980/mcp`). It exposes 7 tools: `search_places`,
+`geocode_address`, `reverse_geocode`, `get_place`, `get_directions`,
+`distance_matrix`, `list_geo_providers`. Directions and the distance matrix run on
+OpenStreetMap routing (OSRM) with **no API key**.
 
 Works with **zero API keys** (OpenStreetMap). Enable more providers by adding an
 `"env"` block to any config below:

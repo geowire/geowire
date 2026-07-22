@@ -1,13 +1,14 @@
 import { createInterface } from "node:readline/promises";
 import { resolve } from "node:path";
 import type { Logger } from "@geowirehq/provider-sdk";
-import type { Strategy } from "@geowirehq/schema";
+import type { Strategy, LatLng, TravelMode } from "@geowirehq/schema";
 import { createGeoFromEnv } from "@geowirehq/server";
 import { consoleIO, type IO } from "./io.js";
 import { loadDotEnv } from "./env.js";
 import { parseFlags, parseNear, flagInt } from "./args.js";
 import { runSearch } from "./commands/search.js";
 import { runReverse } from "./commands/reverse.js";
+import { runRoute } from "./commands/route.js";
 import { runGet } from "./commands/get.js";
 import { runTest } from "./commands/test.js";
 import { runServe } from "./commands/serve.js";
@@ -35,6 +36,8 @@ Usage:
                 [--country CC] [--strategy first-success|merge] [--json]
   geowire reverse <lat,lon>        Reverse-geocode a coordinate → nearest place
                 [--json]
+  geowire route <lat,lon> <lat,lon> [...]   Directions between waypoints (no key)
+                [--mode driving|walking|cycling] [--geometry] [--json]
   geowire get <provider:id>        Fetch one place by provider reference
                 [--json]           (needs a getPlace-capable provider, e.g.
                                     Google: geowire get google:ChIJN1t_tDeuEmsR...)
@@ -92,6 +95,19 @@ async function reverseCmd(rest: string[], io: IO): Promise<number> {
   return runReverse(geo, { location, json: flags.json === true }, io);
 }
 
+async function routeCmd(rest: string[], io: IO): Promise<number> {
+  const { _, flags } = parseFlags(rest);
+  const waypoints = _.map((s) => parseNear(s)).filter((p): p is LatLng => p != null);
+  if (waypoints.length < 2) {
+    io.err('usage: geowire route <lat,lon> <lat,lon> [...]   e.g. geowire route 37.5665,126.9780 37.4979,127.0276');
+    return 1;
+  }
+  const mode =
+    typeof flags.mode === "string" ? (flags.mode as TravelMode) : undefined;
+  const geo = createGeoFromEnv(logger);
+  return runRoute(geo, { waypoints, mode, geometry: flags.geometry === true, json: flags.json === true }, io);
+}
+
 async function getCmd(rest: string[], io: IO): Promise<number> {
   const { _, flags } = parseFlags(rest);
   const id = _[0]?.trim();
@@ -124,6 +140,8 @@ export async function run(argv: string[], io: IO = consoleIO): Promise<number> {
       return searchCmd(rest, io);
     case "reverse":
       return reverseCmd(rest, io);
+    case "route":
+      return routeCmd(rest, io);
     case "get":
       return getCmd(rest, io);
     case "test":

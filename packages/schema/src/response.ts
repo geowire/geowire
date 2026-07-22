@@ -2,6 +2,7 @@ import { z } from "zod";
 import { Place } from "./place.js";
 import { ProviderErrorCode } from "./errors.js";
 import { Strategy } from "./requests.js";
+import { Route, DistanceMatrix } from "./routing.js";
 
 export const ProviderUsage = z.object({
   provider: z.string(),
@@ -47,3 +48,17 @@ export const SearchPlacesResponse = z.object({
   meta: ResponseMeta,
 });
 export type SearchPlacesResponse = z.infer<typeof SearchPlacesResponse>;
+
+/** 길찾기 응답 봉투 — 검색과 동일한 투명성 meta를 공유한다 */
+export const RouteResponse = z.object({
+  routes: z.array(Route),
+  meta: ResponseMeta,
+});
+export type RouteResponse = z.infer<typeof RouteResponse>;
+
+/** 거리 행렬 응답 봉투 */
+export const DistanceMatrixResponse = z.object({
+  matrix: DistanceMatrix,
+  meta: ResponseMeta,
+});
+export type DistanceMatrixResponse = z.infer<typeof DistanceMatrixResponse>;

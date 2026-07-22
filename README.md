@@ -75,6 +75,7 @@ Add `"env": { "GOOGLE_MAPS_API_KEY": "..." }` for business listings and hours
 npx @geowirehq/cli search "Eiffel Tower"          # terminal search with a results table
 npx @geowirehq/cli search "Starbucks" --near 37.4979,127.0276 --radius 3000   # near a coordinate
 npx @geowirehq/cli reverse 37.5665,126.9780       # coordinate → nearest place
+npx @geowirehq/cli route 37.5665,126.9780 37.4979,127.0276   # driving directions (no key, OSRM)
 npx @geowirehq/cli get google:ChIJ...             # one place by reference (getPlace-capable provider)
 npx @geowirehq/cli                                # start the REST + MCP server (zero-config)
 npx @geowirehq/cli init                           # interactive setup wizard (.env + config)
@@ -119,6 +120,8 @@ Full embedded-SDK guide: [`examples/typescript-sdk.md`](./examples/typescript-sd
 | `get_place` | Details by `provider:providerPlaceId` reference |
 | `geocode_address` | Address → coordinates (+ normalized address) |
 | `reverse_geocode` | Coordinates → nearest address |
+| `get_directions` | Route between waypoints (distance, time, legs) — no key (OSRM) |
+| `distance_matrix` | N×M travel distances/times — rank candidates by drive time — no key |
 | `list_geo_providers` | Active providers, capabilities, status (agent self-awareness) |
 
 Every response includes both a human-readable summary and `structuredContent`
@@ -132,6 +135,8 @@ Every response includes both a human-readable summary and `structuredContent`
 | GET | `/v1/places/{ref}` | place details (`provider:id`) |
 | GET | `/v1/geocode?address=` | geocode |
 | GET | `/v1/reverse-geocode?lat=&lon=` | reverse geocode |
+| POST | `/v1/directions` | directions between waypoints (no key) |
+| POST | `/v1/distance-matrix` | N×M travel distance/time matrix (no key) |
 | GET | `/v1/providers` | list providers |
 | GET | `/v1/health` | health check |
 | GET | `/metrics` | Prometheus metrics |
@@ -202,6 +207,7 @@ Keys come from the environment (`${VAR}`), never committed in plaintext.
 | Provider | Key? | Capabilities |
 |---|---|---|
 | `@geowirehq/provider-nominatim` (OpenStreetMap) | none | search, geocode, reverseGeocode |
+| `@geowirehq/provider-osrm` (OpenStreetMap routing) | none | route, distanceMatrix |
 | `@geowirehq/provider-google` (Maps Platform) | BYOK | search, geocode, reverseGeocode, getPlace |
 | `@geowirehq/provider-kakao` (카카오맵, KR) | BYOK `KAKAO_REST_API_KEY` | search, geocode, reverseGeocode |
 | `@geowirehq/provider-naver` (네이버 지역검색, KR) | BYOK `NAVER_CLIENT_ID`+`NAVER_CLIENT_SECRET` | search, geocode |
@@ -253,13 +259,15 @@ Want another provider? See [CONTRIBUTING.md](./CONTRIBUTING.md) —
 
 v0.1 is deliberately "It works" scope. Honest about what's **not** in it yet:
 
-| Area | v0.1 | Planned |
+| Area | Shipped | Planned |
 |---|---|---|
-| Operations | search, geocode, reverse-geocode, get-place | **autocomplete** (typed, not wired) |
-| Strategies | `first-success`, `merge`, `cost-aware`, `weighted`, **`fastest`** | — (all 5 shipped) |
-| Routing | explicit `country` | country **inference** from coordinates (v0.3) |
-| Cache | in-memory (LRU) | **Redis** adapter (v0.2) |
-| Providers | OSM, Google, Kakao, Naver, **Baidu, Foursquare**, your CSV | Mapbox, HERE, TomTom, … (community PRs welcome) |
+| Operations | search, geocode, reverse-geocode, get-place, **directions, distance-matrix** | **autocomplete** (typed, not wired) |
+| Strategies | `first-success`, `merge`, `cost-aware`, `weighted`, `fastest` | — (all 5 shipped) |
+| Field sourcing | **role-based merge** (each provider's authoritative fields) | per-field config overrides |
+| Routing providers | **OSRM** (no key) | Google Routes, Mapbox, Valhalla (BYOK) |
+| Routing | explicit `country` | country **inference** from coordinates |
+| Cache | in-memory (LRU) | **Redis** adapter |
+| Providers | OSM, OSRM, Google, Kakao, Naver, Baidu, Foursquare, your CSV | Mapbox, HERE, TomTom, … (community PRs welcome) |
 | Rate limiting | per-provider (OSM 1 req/s) | global / per-endpoint |
 
 ## Architecture
@@ -271,7 +279,7 @@ AI agent / app
 GeoWire core  ── pipeline: plan → execute → normalize → dedup → rank → policy → cache
    │  GeoProvider contract
    ▼
-providers: nominatim · google · internal · (community)
+providers: nominatim · osrm · google · kakao · naver · baidu · foursquare · internal · (community)
 ```
 
 Monorepo packages: `schema` · `provider-sdk` · `provider-testkit` · `core` ·

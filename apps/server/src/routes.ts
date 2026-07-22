@@ -1,7 +1,15 @@
 import { z } from "zod";
 import type { FastifyInstance } from "fastify";
 import type { GeoWire } from "@geowirehq/core";
-import { SearchPlacesRequest, SearchPlacesResponse, Place } from "@geowirehq/schema";
+import {
+  SearchPlacesRequest,
+  SearchPlacesResponse,
+  Place,
+  RouteRequest,
+  RouteResponse,
+  DistanceMatrixRequest,
+  DistanceMatrixResponse,
+} from "@geowirehq/schema";
 import type { Metrics } from "./metrics.js";
 
 /** Zod → JSON Schema (OpenAPI 문서 전용; 검증은 core의 Zod가 담당). $schema 메타 제거 */
@@ -116,6 +124,40 @@ export function registerRoutes(app: FastifyInstance, geo: GeoWire, metrics: Metr
       const result = await geo.reverseGeocode({
         location: { latitude: q.lat, longitude: q.lon },
       });
+      metrics.recordMeta(result.meta);
+      return result;
+    },
+  );
+
+  app.post(
+    "/v1/directions",
+    {
+      schema: {
+        tags: ["routing"],
+        summary: "경유지 간 길찾기 (거리·시간·구간). 무키 OSRM",
+        body: jsonSchema(RouteRequest),
+        response: { 200: jsonSchema(RouteResponse) },
+      },
+    },
+    async (request) => {
+      const result = await geo.getRoute(request.body);
+      metrics.recordMeta(result.meta);
+      return result;
+    },
+  );
+
+  app.post(
+    "/v1/distance-matrix",
+    {
+      schema: {
+        tags: ["routing"],
+        summary: "원점×목적지 거리/시간 행렬. 무키 OSRM",
+        body: jsonSchema(DistanceMatrixRequest),
+        response: { 200: jsonSchema(DistanceMatrixResponse) },
+      },
+    },
+    async (request) => {
+      const result = await geo.getDistanceMatrix(request.body);
       metrics.recordMeta(result.meta);
       return result;
     },

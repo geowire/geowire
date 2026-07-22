@@ -26,5 +26,17 @@ export {
   ProviderSkip,
   ResponseMeta,
   SearchPlacesResponse,
+  RouteResponse,
+  DistanceMatrixResponse,
 } from "./response.js";
+export {
+  TravelMode,
+  LineString,
+  RouteLeg,
+  Route,
+  RouteRequest,
+  DistanceMatrixCell,
+  DistanceMatrixRequest,
+  DistanceMatrix,
+} from "./routing.js";
 export { generateJsonSchemas } from "./json-schema.js";
