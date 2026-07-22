@@ -10,6 +10,9 @@ import type {
   GeocodeRequest,
   ReverseGeocodeRequest,
   GetPlaceRequest,
+  RouteRequest,
+  DistanceMatrixRequest,
+  LatLng,
   ProviderErrorCode,
 } from "@geowirehq/schema";
 import { GOOGLE_MANIFEST } from "./manifest.js";
@@ -20,9 +23,16 @@ import {
   type GooglePlace,
   type GeocodeResult,
 } from "./parse.js";
+import {
+  GOOGLE_TRAVEL_MODE,
+  parseGoogleRoutes,
+  parseGoogleMatrix,
+  type GoogleMatrixElement,
+} from "./routes-parse.js";
 
 const DEFAULT_PLACES_BASE = "https://places.googleapis.com/v1";
 const DEFAULT_GEOCODE_BASE = "https://maps.googleapis.com/maps/api";
+const DEFAULT_ROUTES_BASE = "https://routes.googleapis.com";
 
 /** Place 리소스에서 요청할 필드 (FieldMask; Places API New는 필수) */
 const PLACE_FIELDS = [
@@ -56,6 +66,8 @@ export interface GoogleOptions {
   placesBaseUrl?: string;
   /** Geocoding API 베이스 URL 오버라이드 */
   geocodeBaseUrl?: string;
+  /** Routes API 베이스 URL 오버라이드 */
+  routesBaseUrl?: string;
   /** 기본 응답 언어(BCP 47). 요청 options.language가 우선 */
   language?: string;
 }
@@ -85,6 +97,7 @@ function geocodeStatusCode(status: string | undefined): ProviderErrorCode | null
 export function createGoogleProvider(options: GoogleOptions = {}): GeoProvider {
   const placesBase = (options.placesBaseUrl ?? DEFAULT_PLACES_BASE).replace(/\/+$/, "");
   const geocodeBase = (options.geocodeBaseUrl ?? DEFAULT_GEOCODE_BASE).replace(/\/+$/, "");
+  const routesBase = (options.routesBaseUrl ?? DEFAULT_ROUTES_BASE).replace(/\/+$/, "");
 
   function requireKey(): string {
     if (!options.apiKey) {
@@ -111,6 +124,27 @@ export function createGoogleProvider(options: GoogleOptions = {}): GeoProvider {
         "X-Goog-FieldMask": fieldMask,
         ...rest.headers,
       },
+    });
+    if (!res.ok) throw errorFromHttpStatus(res.status, { provider: "google" });
+    return res.json();
+  }
+
+  /** Routes API 호출 (POST + X-Goog-Api-Key + X-Goog-FieldMask). 응답 JSON 반환 */
+  async function routesFetch(
+    path: string,
+    body: unknown,
+    fieldMask: string,
+    ctx: ProviderContext,
+  ): Promise<unknown> {
+    const apiKey = requireKey();
+    const res = await ctx.fetch(`${routesBase}${path}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": apiKey,
+        "X-Goog-FieldMask": fieldMask,
+      },
+      body: JSON.stringify(body),
     });
     if (!res.ok) throw errorFromHttpStatus(res.status, { provider: "google" });
     return res.json();
@@ -193,5 +227,55 @@ export function createGoogleProvider(options: GoogleOptions = {}): GeoProvider {
       )) as GooglePlace;
       return parseGooglePlace(json);
     },
+
+    async route(req: RouteRequest, ctx) {
+      const [origin, ...rest] = req.waypoints;
+      const destination = rest.pop()!;
+      const intermediates = rest;
+      const body: Record<string, unknown> = {
+        origin: waypointLatLng(origin!),
+        destination: waypointLatLng(destination),
+        travelMode: GOOGLE_TRAVEL_MODE[req.mode],
+        computeAlternativeRoutes: req.alternatives,
+      };
+      if (intermediates.length > 0) body.intermediates = intermediates.map(waypointLatLng);
+      const fields = ["routes.distanceMeters", "routes.duration", "routes.legs.distanceMeters", "routes.legs.duration"];
+      if (req.geometry) {
+        body.polylineEncoding = "GEO_JSON_LINESTRING";
+        fields.push("routes.polyline.geoJsonLinestring");
+      }
+      const json = (await routesFetch(
+        "/directions/v2:computeRoutes",
+        body,
+        fields.join(","),
+        ctx,
+      )) as { routes?: Parameters<typeof parseGoogleRoutes>[0] };
+      return parseGoogleRoutes(json.routes);
+    },
+
+    async distanceMatrix(req: DistanceMatrixRequest, ctx) {
+      const body = {
+        origins: req.origins.map(matrixWaypoint),
+        destinations: req.destinations.map(matrixWaypoint),
+        travelMode: GOOGLE_TRAVEL_MODE[req.mode],
+      };
+      const json = (await routesFetch(
+        "/distanceMatrix/v2:computeRouteMatrix",
+        body,
+        "originIndex,destinationIndex,distanceMeters,duration,condition",
+        ctx,
+      )) as GoogleMatrixElement[];
+      return parseGoogleMatrix(json, req.origins.length, req.destinations.length);
+    },
   });
+}
+
+/** LatLng → Routes API waypoint(location.latLng) */
+function waypointLatLng(p: LatLng): { location: { latLng: { latitude: number; longitude: number } } } {
+  return { location: { latLng: { latitude: p.latitude, longitude: p.longitude } } };
+}
+
+/** LatLng → Route Matrix waypoint(waypoint.location.latLng) */
+function matrixWaypoint(p: LatLng): { waypoint: ReturnType<typeof waypointLatLng> } {
+  return { waypoint: waypointLatLng(p) };
 }

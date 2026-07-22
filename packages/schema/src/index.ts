@@ -28,7 +28,14 @@ export {
   SearchPlacesResponse,
   RouteResponse,
   DistanceMatrixResponse,
+  AreaInsightsResponse,
 } from "./response.js";
+export {
+  AreaInsightsRequest,
+  StatSummary,
+  CategoryInsight,
+  AreaInsights,
+} from "./analysis.js";
 export {
   TravelMode,
   LineString,

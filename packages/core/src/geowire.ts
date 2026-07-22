@@ -11,6 +11,8 @@ import {
   RouteResponse,
   DistanceMatrixRequest,
   DistanceMatrixResponse,
+  AreaInsightsRequest,
+  AreaInsightsResponse,
   Place,
 } from "@geowirehq/schema";
 import { GeoWireConfig, defaultConfig } from "./config/schema.js";
@@ -20,6 +22,7 @@ import { ProviderRegistry } from "./registry.js";
 import { runOperation } from "./pipeline/pipeline.js";
 import { runGetPlace } from "./pipeline/get-place.js";
 import { runRoute, runDistanceMatrix } from "./pipeline/routing.js";
+import { runAreaInsights } from "./analysis/area.js";
 import { resolveCountry } from "./pipeline/normalize-request.js";
 import type { OperationSpec } from "./pipeline/types.js";
 import { MemoryCache } from "./cache/memory.js";
@@ -166,6 +169,16 @@ export class GeoWire {
       throw new Error("사용 가능한 distanceMatrix 공급자가 없습니다 (OSRM 등록 필요)");
     }
     return DistanceMatrixResponse.parse({ matrix, meta });
+  }
+
+  /**
+   * 지역/상권 분석 (설계: analysis/v1). 중심점 반경 내 업종별 밀도·경쟁·평점 지형을 집계한다.
+   * 검색 파이프라인 위에 쌓는 상위 레이어. 응답도 `AreaInsightsResponse`로 자기 검증한다.
+   */
+  async analyzeArea(input: unknown): Promise<AreaInsightsResponse> {
+    const req = AreaInsightsRequest.parse(input);
+    const { insights, meta } = await runAreaInsights(this, req);
+    return AreaInsightsResponse.parse({ insights, meta });
   }
 
   /** 활성/비활성 공급자 요약. list_geo_providers·/v1/providers의 데이터원 */

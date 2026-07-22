@@ -19,7 +19,7 @@ import type { ProviderManifest } from "@geowirehq/schema";
 export const GOOGLE_MANIFEST: ProviderManifest = {
   id: "google",
   name: "Google Maps Platform",
-  capabilities: ["search", "geocode", "reverseGeocode", "getPlace"],
+  capabilities: ["search", "geocode", "reverseGeocode", "getPlace", "route", "distanceMatrix"],
   authType: "apiKey",
   cost: {
     currency: "USD",
@@ -28,6 +28,9 @@ export const GOOGLE_MANIFEST: ProviderManifest = {
       getPlace: 0.017,
       geocode: 0.005,
       reverseGeocode: 0.005,
+      // Routes API: Compute Routes(Basic) $0.005/route, Route Matrix $0.005/element(원점×목적지)
+      route: 0.005,
+      distanceMatrix: 0.005,
     },
   },
   // 리뷰·사진·평점·영업시간·전화가 Google의 권위 영역 (설계 §7.3 "영업시간은 Google").

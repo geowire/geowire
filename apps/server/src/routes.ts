@@ -9,6 +9,8 @@ import {
   RouteResponse,
   DistanceMatrixRequest,
   DistanceMatrixResponse,
+  AreaInsightsRequest,
+  AreaInsightsResponse,
 } from "@geowirehq/schema";
 import type { Metrics } from "./metrics.js";
 
@@ -158,6 +160,23 @@ export function registerRoutes(app: FastifyInstance, geo: GeoWire, metrics: Metr
     },
     async (request) => {
       const result = await geo.getDistanceMatrix(request.body);
+      metrics.recordMeta(result.meta);
+      return result;
+    },
+  );
+
+  app.post(
+    "/v1/analyze-area",
+    {
+      schema: {
+        tags: ["analysis"],
+        summary: "지역/상권 분석 — 반경 내 업종별 밀도·경쟁·평점 지형",
+        body: jsonSchema(AreaInsightsRequest),
+        response: { 200: jsonSchema(AreaInsightsResponse) },
+      },
+    },
+    async (request) => {
+      const result = await geo.analyzeArea(request.body);
       metrics.recordMeta(result.meta);
       return result;
     },

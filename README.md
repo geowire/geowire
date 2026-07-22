@@ -122,6 +122,7 @@ Full embedded-SDK guide: [`examples/typescript-sdk.md`](./examples/typescript-sd
 | `reverse_geocode` | Coordinates → nearest address |
 | `get_directions` | Route between waypoints (distance, time, legs) — no key (OSRM) |
 | `distance_matrix` | N×M travel distances/times — rank candidates by drive time — no key |
+| `analyze_area` | Commercial-area analysis: category density, competition, rating landscape |
 | `list_geo_providers` | Active providers, capabilities, status (agent self-awareness) |
 
 Every response includes both a human-readable summary and `structuredContent`
@@ -137,6 +138,7 @@ Every response includes both a human-readable summary and `structuredContent`
 | GET | `/v1/reverse-geocode?lat=&lon=` | reverse geocode |
 | POST | `/v1/directions` | directions between waypoints (no key) |
 | POST | `/v1/distance-matrix` | N×M travel distance/time matrix (no key) |
+| POST | `/v1/analyze-area` | commercial-area analysis (density, competition, ratings) |
 | GET | `/v1/providers` | list providers |
 | GET | `/v1/health` | health check |
 | GET | `/metrics` | Prometheus metrics |
@@ -208,7 +210,7 @@ Keys come from the environment (`${VAR}`), never committed in plaintext.
 |---|---|---|
 | `@geowirehq/provider-nominatim` (OpenStreetMap) | none | search, geocode, reverseGeocode |
 | `@geowirehq/provider-osrm` (OpenStreetMap routing) | none | route, distanceMatrix |
-| `@geowirehq/provider-google` (Maps Platform) | BYOK | search, geocode, reverseGeocode, getPlace |
+| `@geowirehq/provider-google` (Maps Platform) | BYOK | search, geocode, reverseGeocode, getPlace, route, distanceMatrix |
 | `@geowirehq/provider-kakao` (카카오맵, KR) | BYOK `KAKAO_REST_API_KEY` | search, geocode, reverseGeocode |
 | `@geowirehq/provider-naver` (네이버 지역검색, KR) | BYOK `NAVER_CLIENT_ID`+`NAVER_CLIENT_SECRET` | search, geocode |
 | `@geowirehq/provider-baidu` (百度地图, CN) | BYOK `BAIDU_MAP_AK` | search, geocode, reverseGeocode |
@@ -261,11 +263,12 @@ v0.1 is deliberately "It works" scope. Honest about what's **not** in it yet:
 
 | Area | Shipped | Planned |
 |---|---|---|
-| Operations | search, geocode, reverse-geocode, get-place, **directions, distance-matrix** | **autocomplete** (typed, not wired) |
+| Operations | search, geocode, reverse-geocode, get-place, directions, distance-matrix, **area analysis** | **autocomplete** (typed, not wired) |
 | Strategies | `first-success`, `merge`, `cost-aware`, `weighted`, `fastest` | — (all 5 shipped) |
 | Field sourcing | **role-based merge** (each provider's authoritative fields) | per-field config overrides |
-| Routing providers | **OSRM** (no key) | Google Routes, Mapbox, Valhalla (BYOK) |
-| Routing | explicit `country` | country **inference** from coordinates |
+| Routing providers | **OSRM** (no key), **Google Routes** (BYOK) | Mapbox, Valhalla, HERE |
+| Routing | explicit `country`, free-first cost ordering | country **inference** from coordinates |
+| Analysis | **category density / competition / rating landscape** | demographics, foot-traffic, isochrones |
 | Cache | in-memory (LRU) | **Redis** adapter |
 | Providers | OSM, OSRM, Google, Kakao, Naver, Baidu, Foursquare, your CSV | Mapbox, HERE, TomTom, … (community PRs welcome) |
 | Rate limiting | per-provider (OSM 1 req/s) | global / per-endpoint |

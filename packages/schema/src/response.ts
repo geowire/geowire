@@ -3,6 +3,7 @@ import { Place } from "./place.js";
 import { ProviderErrorCode } from "./errors.js";
 import { Strategy } from "./requests.js";
 import { Route, DistanceMatrix } from "./routing.js";
+import { AreaInsights } from "./analysis.js";
 
 export const ProviderUsage = z.object({
   provider: z.string(),
@@ -62,3 +63,10 @@ export const DistanceMatrixResponse = z.object({
   meta: ResponseMeta,
 });
 export type DistanceMatrixResponse = z.infer<typeof DistanceMatrixResponse>;
+
+/** 지역/상권 분석 응답 봉투 */
+export const AreaInsightsResponse = z.object({
+  insights: AreaInsights,
+  meta: ResponseMeta,
+});
+export type AreaInsightsResponse = z.infer<typeof AreaInsightsResponse>;

@@ -41,6 +41,7 @@ export async function buildServer(opts: BuildOptions): Promise<FastifyInstance> 
         { name: "places", description: "장소 검색·상세" },
         { name: "geocode", description: "주소↔좌표 변환" },
         { name: "routing", description: "길찾기·거리행렬" },
+        { name: "analysis", description: "지역·상권 분석" },
         { name: "meta", description: "공급자·헬스" },
       ],
     },

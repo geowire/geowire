@@ -183,3 +183,82 @@ describe("createGoogleProvider — BYOK", () => {
     ).rejects.toBeInstanceOf(GeoProviderError);
   });
 });
+
+const routeBody = {
+  routes: [
+    {
+      distanceMeters: 9950,
+      duration: "600s",
+      legs: [
+        { distanceMeters: 5000, duration: "300s" },
+        { distanceMeters: 4950, duration: "300s" },
+      ],
+      polyline: {
+        geoJsonLinestring: {
+          type: "LineString",
+          coordinates: [
+            [126.978, 37.5665],
+            [127.0276, 37.4979],
+          ],
+        },
+      },
+    },
+  ],
+};
+
+describe("createGoogleProvider — Routes(길찾기·거리행렬, BYOK)", () => {
+  const WPS = [
+    { latitude: 37.5665, longitude: 126.978 },
+    { latitude: 37.5172, longitude: 127.0473 },
+    { latitude: 37.4979, longitude: 127.0276 },
+  ];
+
+  it("route: 거리·시간(600s→600)·구간·GeoJSON 지오메트리를 파싱한다", async () => {
+    const ctx = createTestContext(jsonFetch(routeBody));
+    const routes = await provider.route!(
+      { waypoints: WPS, mode: "driving", alternatives: false, geometry: true },
+      ctx,
+    );
+    expect(routes[0]!.distanceMeters).toBe(9950);
+    expect(routes[0]!.durationSeconds).toBe(600); // "600s" → 600
+    expect(routes[0]!.legs).toHaveLength(2);
+    expect(routes[0]!.geometry?.type).toBe("LineString");
+  });
+
+  it("route: travelMode·중간경유지·POST 바디를 올바르게 보낸다", async () => {
+    let body: Record<string, unknown> = {};
+    let mask = "";
+    const ctx = createTestContext((url, init) => {
+      body = JSON.parse(String(init?.body));
+      mask = new Headers(init?.headers).get("X-Goog-FieldMask") ?? "";
+      return mockJson(routeBody);
+    });
+    await provider.route!({ waypoints: WPS, mode: "walking", alternatives: false, geometry: false }, ctx);
+    expect(body.travelMode).toBe("WALK");
+    // 첫·마지막은 origin/destination, 가운데는 intermediates
+    expect(body.intermediates).toHaveLength(1);
+    expect(mask).toContain("routes.distanceMeters");
+    expect(mask).not.toContain("polyline"); // geometry:false면 폴리라인 미요청
+  });
+
+  it("distanceMatrix: originIndex/destinationIndex로 배치, ROUTE_NOT_FOUND는 빈 셀", async () => {
+    const matrixBody = [
+      { originIndex: 0, destinationIndex: 0, distanceMeters: 9950, duration: "600s", condition: "ROUTE_EXISTS" },
+      { originIndex: 0, destinationIndex: 1, condition: "ROUTE_NOT_FOUND" },
+    ];
+    const ctx = createTestContext(jsonFetch(matrixBody));
+    const m = await provider.distanceMatrix!(
+      {
+        origins: [{ latitude: 37.57, longitude: 126.98 }],
+        destinations: [
+          { latitude: 37.49, longitude: 127.02 },
+          { latitude: 37.51, longitude: 127.05 },
+        ],
+        mode: "driving",
+      },
+      ctx,
+    );
+    expect(m.rows[0]![0]).toEqual({ distanceMeters: 9950, durationSeconds: 600 });
+    expect(m.rows[0]![1]).toEqual({}); // ROUTE_NOT_FOUND → 빈 셀
+  });
+});

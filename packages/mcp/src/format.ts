@@ -1,4 +1,4 @@
-import type { Place, ResponseMeta, Route, DistanceMatrix } from "@geowirehq/schema";
+import type { Place, ResponseMeta, Route, DistanceMatrix, AreaInsights } from "@geowirehq/schema";
 import type { ProviderInfo } from "@geowirehq/core";
 
 /** 초 → 사람이 읽는 시간 (예: "1h 12m", "8m", "45s") */
@@ -104,6 +104,22 @@ export function formatMatrix(matrix: DistanceMatrix, meta: ResponseMeta): string
   });
   const attribution = meta.attributions.length ? `\nAttribution: ${meta.attributions.join("; ")}` : "";
   return `Distance matrix (${matrix.rows.length}×${matrix.rows[0]?.length ?? 0}, ${matrix.provider}):\n${rows.join("\n")}\n\n${formatMeta(meta)}${attribution}`.trim();
+}
+
+/** 지역/상권 분석 텍스트 */
+export function formatAreaInsights(insights: AreaInsights, meta: ResponseMeta): string {
+  const head = `Area analysis — ${insights.radiusMeters}m radius (${insights.areaSqKm} km²), ${insights.totalPlaces} places, ${insights.densityPerSqKm}/km²`;
+  const rows = insights.categories.map((c) => {
+    const rating = c.rating ? `, ★${c.rating.average} avg (${c.rating.count})` : "";
+    const price = c.priceLevel ? `, price ${c.priceLevel.average.toFixed(1)}/4` : "";
+    const top = c.topPlaces
+      .map((p) => `${p.name}${p.business?.rating != null ? ` ★${p.business.rating}` : ""}`)
+      .join(", ");
+    return `- ${c.category}: ${c.count} found (${c.densityPerSqKm}/km²)${rating}${price}${top ? `\n    top: ${top}` : ""}`;
+  });
+  const overall = insights.rating ? `\nOverall rating: ★${insights.rating.average} avg over ${insights.rating.count} rated places` : "";
+  const attribution = meta.attributions.length ? `\nAttribution: ${meta.attributions.join("; ")}` : "";
+  return `${head}\n${rows.join("\n")}${overall}\n\n${formatMeta(meta)}${attribution}`.trim();
 }
 
 /** list_geo_providers 텍스트 */

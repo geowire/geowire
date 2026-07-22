@@ -1,6 +1,6 @@
 {
   "name": "@geowirehq/provider-baidu",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "GeoWire Baidu Maps provider (百度地图) — China place search, geocode, reverse (BYOK, BD-09↔WGS84)",
   "license": "Apache-2.0",
   "type": "module",

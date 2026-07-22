@@ -24,11 +24,17 @@ interface Dispatch {
   attributions: string[];
 }
 
-/** 라우팅 계열 공통 first-success 실행기. 첫 non-empty 결과의 provider에서 멈춘다. */
+/**
+ * 라우팅 계열 공통 first-success 실행기. 첫 non-empty 결과의 provider에서 멈춘다.
+ * **비용 오름차순**으로 시도한다 — 무키 OSRM을 먼저, 유료(Google)는 무료가 답 못 할 때만
+ * (GeoWire 비용 거버넌스: 키를 넣었다고 라우팅까지 자동 과금하지 않는다).
+ * `providers` allowlist가 주어지면 그 공급자만 사용한다(예: 강제로 Google 라우팅).
+ */
 async function firstSuccess<T>(
   host: PipelineHost,
   capability: "route" | "distanceMatrix",
   timeoutMs: number,
+  providers: string[] | undefined,
   call: (rp: RegisteredProvider, ctx: ReturnType<typeof makeContext>) => Promise<T | null>,
 ): Promise<{ result: T | null; meta: ResponseMeta }> {
   const deps: ExecuteDeps = {
@@ -40,8 +46,18 @@ async function firstSuccess<T>(
   const ctx = makeContext(deps, timeoutMs);
   const d: Dispatch = { used: [], skipped: [], failed: [], estimatedCostUSD: 0, attributions: [] };
 
+  const allow = providers && providers.length > 0 ? new Set(providers) : undefined;
+  const candidates = host.registry
+    .supporting(capability)
+    .filter((rp) => !allow || allow.has(rp.id))
+    .sort(
+      (a, b) =>
+        providerCallCost(a.id, capability, host.registry) -
+        providerCallCost(b.id, capability, host.registry),
+    );
+
   let result: T | null = null;
-  for (const rp of host.registry.supporting(capability)) {
+  for (const rp of candidates) {
     const start = host.now();
     try {
       const out = await call(rp, ctx);
@@ -86,6 +102,7 @@ export async function runRoute(
     host,
     "route",
     timeoutMs,
+    req.options?.providers,
     async (rp, ctx) => {
       const fn = rp.provider.route;
       if (typeof fn !== "function") return null;
@@ -112,6 +129,7 @@ export async function runDistanceMatrix(
     host,
     "distanceMatrix",
     timeoutMs,
+    req.options?.providers,
     async (rp, ctx) => {
       const fn = rp.provider.distanceMatrix;
       if (typeof fn !== "function") return null;

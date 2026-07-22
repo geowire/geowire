@@ -70,6 +70,46 @@ describe("getRoute (길찾기 디스패치)", () => {
     expect(res.meta.providersFailed).toContainEqual({ provider: "broken", reason: "PROVIDER_UNAVAILABLE" });
   });
 
+  it("비용 오름차순으로 무료(osrm) 우선, 유료(google)는 폴백 — 키 넣어도 자동 과금 안 함", async () => {
+    const geo = createGeoWire({
+      providers: [
+        fakeProvider({
+          id: "google",
+          capabilities: ["route"],
+          cost: { currency: "USD", perCall: { route: 0.005 } },
+          routeResult: [{ ...ROUTE, distanceMeters: 111 }],
+        }),
+        fakeProvider({ id: "osrm", capabilities: ["route"], routeResult: [{ ...ROUTE, distanceMeters: 999 }] }),
+      ],
+      // google에 더 높은 priority를 줘도 비용이 우선 → osrm 먼저
+      config: {
+        providers: { google: { enabled: true, priority: 100 }, osrm: { enabled: true, priority: 0 } },
+      },
+    });
+    const res = await geo.getRoute({ waypoints: TWO_WAY });
+    expect(res.routes[0]!.provider).toBe("osrm");
+    expect(res.routes[0]!.distanceMeters).toBe(999);
+    expect(res.meta.estimatedCostUSD).toBeUndefined(); // 무료만 사용
+  });
+
+  it("options.providers로 유료 Google 라우팅을 강제할 수 있다", async () => {
+    const geo = createGeoWire({
+      providers: [
+        fakeProvider({
+          id: "google",
+          capabilities: ["route"],
+          cost: { currency: "USD", perCall: { route: 0.005 } },
+          routeResult: [{ ...ROUTE, distanceMeters: 111 }],
+        }),
+        fakeProvider({ id: "osrm", capabilities: ["route"], routeResult: [{ ...ROUTE, distanceMeters: 999 }] }),
+      ],
+    });
+    const res = await geo.getRoute({ waypoints: TWO_WAY, options: { providers: ["google"] } });
+    expect(res.routes[0]!.provider).toBe("google");
+    expect(res.routes[0]!.distanceMeters).toBe(111);
+    expect(res.meta.estimatedCostUSD).toBeCloseTo(0.005);
+  });
+
   it("route 공급자가 없으면 빈 경로를 반환한다(에러 아님)", async () => {
     const geo = createGeoWire({
       providers: [fakeProvider({ id: "search-only", capabilities: ["search"], search: [] })],

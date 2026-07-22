@@ -6,6 +6,7 @@ import {
   GetPlaceRequest,
   RouteRequest,
   DistanceMatrixRequest,
+  AreaInsightsRequest,
 } from "@geowirehq/schema";
 import type { GeoWire } from "@geowirehq/core";
 import { GeoProviderError } from "@geowirehq/provider-sdk";
@@ -16,6 +17,7 @@ import {
   formatProviders,
   formatRoutes,
   formatMatrix,
+  formatAreaInsights,
 } from "./format.js";
 
 /**
@@ -107,6 +109,18 @@ export const TOOL_DEFS: Tool[] = [
     inputSchema: toInputSchema(DistanceMatrixRequest),
   },
   {
+    name: "analyze_area",
+    description:
+      "Analyze a commercial area / neighborhood: given a center point, radius, and business types, " +
+      "return how many of each exist nearby, their density (per km²), rating landscape, and top places. " +
+      "Use this for market/competition questions — 'how saturated is coffee here', 'is this a good spot " +
+      "for a bakery', 'what's the dining scene within 1km'. " +
+      'Example: {"center": {"latitude": 37.4979, "longitude": 127.0276}, "radiusMeters": 1000, "categories": ["cafe", "restaurant", "convenience store"]}. ' +
+      "Works with any configured providers; richer with Google/Foursquare (ratings). Not demographic data — " +
+      "it's a place-density/competition view built from live search.",
+    inputSchema: toInputSchema(AreaInsightsRequest),
+  },
+  {
     name: "list_geo_providers",
     description:
       "List the geo data providers currently configured, with their capabilities, enabled state, priority, " +
@@ -169,6 +183,10 @@ export async function dispatchTool(
       case "distance_matrix": {
         const res = await geo.getDistanceMatrix(args);
         return textResult(formatMatrix(res.matrix, res.meta), res);
+      }
+      case "analyze_area": {
+        const res = await geo.analyzeArea(args);
+        return textResult(formatAreaInsights(res.insights, res.meta), res);
       }
       case "list_geo_providers": {
         const providers = geo.listProviders();
