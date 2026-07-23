@@ -30,7 +30,9 @@ export {
   DistanceMatrixResponse,
   AreaInsightsResponse,
   DemographicsResponse,
+  IsochroneResponse,
 } from "./response.js";
+export { IsochroneRequest, Isochrone } from "./isochrone.js";
 export {
   MoneyAmount,
   DemographicProfile,
@@ -45,6 +47,7 @@ export {
 export {
   TravelMode,
   LineString,
+  Polygon,
   RouteLeg,
   Route,
   RouteRequest,

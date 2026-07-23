@@ -1,6 +1,6 @@
 {
   "name": "@geowirehq/provider-census",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "GeoWire US Census provider — demographics (population, age, income) by area, free BYOK key",
   "license": "Apache-2.0",
   "type": "module",

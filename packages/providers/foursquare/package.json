@@ -1,6 +1,6 @@
 {
   "name": "@geowirehq/provider-foursquare",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "GeoWire Foursquare Places provider — global POI search + details (BYOK)",
   "license": "Apache-2.0",
   "type": "module",

@@ -8,6 +8,7 @@ import {
   DistanceMatrixRequest,
   AreaInsightsRequest,
   DemographicsRequest,
+  IsochroneRequest,
 } from "@geowirehq/schema";
 import type { GeoWire } from "@geowirehq/core";
 import { GeoProviderError } from "@geowirehq/provider-sdk";
@@ -20,6 +21,7 @@ import {
   formatMatrix,
   formatAreaInsights,
   formatDemographics,
+  formatIsochrone,
 } from "./format.js";
 
 /**
@@ -133,6 +135,17 @@ export const TOOL_DEFS: Tool[] = [
     inputSchema: toInputSchema(DemographicsRequest),
   },
   {
+    name: "get_isochrone",
+    description:
+      "Compute a travel-time reachability area (isochrone): from an origin, the region reachable within N " +
+      "minutes of driving/walking/cycling, as a GeoJSON polygon + area in km². No API key (OpenStreetMap " +
+      "routing). Use for site selection / catchment questions — 'what's within a 15-minute drive', 'how big " +
+      "is this store's 10-min catchment'. " +
+      'Example: {"origin": {"latitude": 37.7749, "longitude": -122.4194}, "minutes": 15, "mode": "driving"}. ' +
+      "It's an approximation (sampled bearings scored by a distance matrix), not a routing-engine isochrone.",
+    inputSchema: toInputSchema(IsochroneRequest),
+  },
+  {
     name: "list_geo_providers",
     description:
       "List the geo data providers currently configured, with their capabilities, enabled state, priority, " +
@@ -203,6 +216,10 @@ export async function dispatchTool(
       case "get_demographics": {
         const res = await geo.getDemographics(args);
         return textResult(formatDemographics(res.profile, res.meta), res);
+      }
+      case "get_isochrone": {
+        const res = await geo.getIsochrone(args);
+        return textResult(formatIsochrone(res.isochrone, res.meta), res);
       }
       case "list_geo_providers": {
         const providers = geo.listProviders();

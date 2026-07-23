@@ -5,6 +5,7 @@ import type {
   DistanceMatrix,
   AreaInsights,
   DemographicProfile,
+  Isochrone,
 } from "@geowirehq/schema";
 import type { ProviderInfo } from "@geowirehq/core";
 
@@ -149,6 +150,20 @@ export function formatDemographics(profile: DemographicProfile | null, meta: Res
   }
   const attribution = profile.attributions.length ? `\nAttribution: ${profile.attributions.join("; ")}` : "";
   return `${summarizeDemographics(profile)}${attribution}`;
+}
+
+/** 도달권(isochrone) 텍스트 */
+export function formatIsochrone(iso: Isochrone | null, meta: ResponseMeta): string {
+  if (!iso) {
+    return `No isochrone available (needs a distance-matrix provider, e.g. OSRM — enabled by default).\n\n${formatMeta(meta)}`;
+  }
+  const ring = iso.polygon.coordinates[0]?.length ?? 0;
+  const attribution = iso.attributions.length ? `\nAttribution: ${iso.attributions.join("; ")}` : "";
+  return (
+    `${iso.minutes}-min ${iso.mode} isochrone from (${coord(iso.origin.latitude)}, ${coord(iso.origin.longitude)}): ` +
+    `~${iso.areaSqKm} km² reachable (${ring - 1}-point polygon, ${iso.reachableSamples}/${iso.sampleCount} samples in budget, ${iso.provider})\n` +
+    `${iso.note}\n\n${formatMeta(meta)}${attribution}`
+  );
 }
 
 /** list_geo_providers 텍스트 */

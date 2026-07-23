@@ -15,6 +15,8 @@ import {
   AreaInsightsResponse,
   DemographicsRequest,
   DemographicsResponse,
+  IsochroneRequest,
+  IsochroneResponse,
   Place,
 } from "@geowirehq/schema";
 import { GeoWireConfig, defaultConfig } from "./config/schema.js";
@@ -25,6 +27,7 @@ import { runOperation } from "./pipeline/pipeline.js";
 import { runGetPlace } from "./pipeline/get-place.js";
 import { runRoute, runDistanceMatrix, runDemographics } from "./pipeline/routing.js";
 import { runAreaInsights } from "./analysis/area.js";
+import { runIsochrone } from "./analysis/isochrone.js";
 import { resolveCountry } from "./pipeline/normalize-request.js";
 import type { OperationSpec } from "./pipeline/types.js";
 import { MemoryCache } from "./cache/memory.js";
@@ -191,6 +194,16 @@ export class GeoWire {
     const req = AreaInsightsRequest.parse(input);
     const { insights, meta } = await runAreaInsights(this, req);
     return AreaInsightsResponse.parse({ insights, meta });
+  }
+
+  /**
+   * 도달권(isochrone) 근사 (설계: isochrone/v1). 출발점에서 N분 내 도달 가능 영역을
+   * 거리행렬(무키 OSRM 등) 위에서 근사한다. 계산할 공급자가 없으면 isochrone은 null.
+   */
+  async getIsochrone(input: unknown): Promise<IsochroneResponse> {
+    const req = IsochroneRequest.parse(input);
+    const { isochrone, meta } = await runIsochrone(this, req);
+    return IsochroneResponse.parse({ isochrone, meta });
   }
 
   /** 활성/비활성 공급자 요약. list_geo_providers·/v1/providers의 데이터원 */

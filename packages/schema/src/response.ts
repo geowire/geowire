@@ -5,6 +5,7 @@ import { Strategy } from "./requests.js";
 import { Route, DistanceMatrix } from "./routing.js";
 import { AreaInsights } from "./analysis.js";
 import { DemographicProfile } from "./demographics.js";
+import { Isochrone } from "./isochrone.js";
 
 export const ProviderUsage = z.object({
   provider: z.string(),
@@ -78,3 +79,10 @@ export const DemographicsResponse = z.object({
   meta: ResponseMeta,
 });
 export type DemographicsResponse = z.infer<typeof DemographicsResponse>;
+
+/** 도달권 응답 봉투. 이동시간을 계산할 공급자가 없으면 isochrone은 null */
+export const IsochroneResponse = z.object({
+  isochrone: Isochrone.nullable(),
+  meta: ResponseMeta,
+});
+export type IsochroneResponse = z.infer<typeof IsochroneResponse>;

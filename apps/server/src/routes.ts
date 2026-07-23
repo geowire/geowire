@@ -12,6 +12,8 @@ import {
   AreaInsightsRequest,
   AreaInsightsResponse,
   DemographicsResponse,
+  IsochroneRequest,
+  IsochroneResponse,
 } from "@geowirehq/schema";
 import type { Metrics } from "./metrics.js";
 
@@ -178,6 +180,23 @@ export function registerRoutes(app: FastifyInstance, geo: GeoWire, metrics: Metr
     },
     async (request) => {
       const result = await geo.analyzeArea(request.body);
+      metrics.recordMeta(result.meta);
+      return result;
+    },
+  );
+
+  app.post(
+    "/v1/isochrone",
+    {
+      schema: {
+        tags: ["analysis"],
+        summary: "도달권(isochrone) — N분 내 도달 영역 폴리곤 (무키 OSRM)",
+        body: jsonSchema(IsochroneRequest),
+        response: { 200: jsonSchema(IsochroneResponse) },
+      },
+    },
+    async (request) => {
+      const result = await geo.getIsochrone(request.body);
       metrics.recordMeta(result.meta);
       return result;
     },

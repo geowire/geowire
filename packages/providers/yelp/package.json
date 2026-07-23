@@ -1,6 +1,6 @@
 {
   "name": "@geowirehq/provider-yelp",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "GeoWire Yelp Fusion provider — US/Western business search, ratings & reviews (BYOK)",
   "license": "Apache-2.0",
   "type": "module",

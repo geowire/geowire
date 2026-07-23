@@ -17,6 +17,13 @@ export const LineString = z.object({
 });
 export type LineString = z.infer<typeof LineString>;
 
+/** GeoJSON Polygon (도달권 등 영역). 외곽 링 하나 이상, 좌표는 [경도, 위도]. */
+export const Polygon = z.object({
+  type: z.literal("Polygon"),
+  coordinates: z.array(z.array(z.tuple([z.number(), z.number()]))),
+});
+export type Polygon = z.infer<typeof Polygon>;
+
 /** 연속한 두 경유지 사이 구간 */
 export const RouteLeg = z.object({
   distanceMeters: z.number().nonnegative(),

@@ -63,9 +63,10 @@ competition, the rating landscape, and (in the US) demographics:
 //   an activity proxy (Yelp review volume), and Census demographics for the tract.
 ```
 
-Same gateway also does **directions & distance matrices** (key-free via OSRM, or
-Google Routes with a key) — so an agent can rank candidates by drive time, not just
-distance. See [Recipes](./docs/recipes.md).
+Same gateway also does **directions & distance matrices** and **travel-time
+isochrones** — key-free via OSRM — so an agent can rank candidates by drive time and
+answer catchment questions like *"what's within a 15-minute drive of this address?"*
+See [Recipes](./docs/recipes.md).
 
 ## Quickstart
 
@@ -146,6 +147,7 @@ Full embedded-SDK guide: [`examples/typescript-sdk.md`](./examples/typescript-sd
 | `get_directions` | Route between waypoints (distance, time, legs) — no key (OSRM) |
 | `distance_matrix` | N×M travel distances/times — rank candidates by drive time — no key |
 | `analyze_area` | Commercial-area analysis: category density, competition, rating landscape, demographics |
+| `get_isochrone` | Travel-time reachability polygon ("what's within a 15-min drive") — no key (OSRM) |
 | `get_demographics` | Population / age / income for a coordinate's area (US Census, free key) |
 | `list_geo_providers` | Active providers, capabilities, status (agent self-awareness) |
 
@@ -163,6 +165,7 @@ Every response includes both a human-readable summary and `structuredContent`
 | POST | `/v1/directions` | directions between waypoints (no key) |
 | POST | `/v1/distance-matrix` | N×M travel distance/time matrix (no key) |
 | POST | `/v1/analyze-area` | commercial-area analysis (density, competition, ratings, demographics) |
+| POST | `/v1/isochrone` | travel-time reachability polygon (no key) |
 | GET | `/v1/demographics?lat=&lon=` | area demographics (US Census, free key) |
 | GET | `/v1/providers` | list providers |
 | GET | `/v1/health` | health check |
@@ -292,12 +295,12 @@ v0.1 is deliberately "It works" scope. Honest about what's **not** in it yet:
 
 | Area | Shipped | Planned |
 |---|---|---|
-| Operations | search, geocode, reverse-geocode, get-place, directions, distance-matrix, **area analysis** | **autocomplete** (typed, not wired) |
+| Operations | search, geocode, reverse-geocode, get-place, directions, distance-matrix, area analysis, **isochrones** | **autocomplete** (typed, not wired) |
 | Strategies | `first-success`, `merge`, `cost-aware`, `weighted`, `fastest` | — (all 5 shipped) |
 | Field sourcing | **role-based merge** (each provider's authoritative fields) | per-field config overrides |
 | Routing providers | **OSRM** (no key), **Google Routes** (BYOK) | Mapbox, Valhalla, HERE |
 | Routing | explicit `country`, free-first cost ordering | country **inference** from coordinates |
-| Analysis | category density / competition / rating landscape, **US demographics**, **activity proxy** | real foot-traffic (paid data), isochrones, Korea demographics (SGIS) |
+| Analysis | category density / competition / rating landscape, US demographics, activity proxy, **isochrones (travel-time catchment)** | real foot-traffic (paid data), exact isochrones (ORS/Valhalla), Korea demographics (SGIS) |
 | Cache | in-memory (LRU) | **Redis** adapter |
 | Providers | OSM, OSRM, Google, **Yelp**, Foursquare, Census, Kakao, Naver, Baidu, your CSV | Mapbox, HERE, TomTom, … (community PRs welcome) |
 | Rate limiting | per-provider (OSM 1 req/s) | global / per-endpoint |
