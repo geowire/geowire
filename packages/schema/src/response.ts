@@ -4,6 +4,7 @@ import { ProviderErrorCode } from "./errors.js";
 import { Strategy } from "./requests.js";
 import { Route, DistanceMatrix } from "./routing.js";
 import { AreaInsights } from "./analysis.js";
+import { DemographicProfile } from "./demographics.js";
 
 export const ProviderUsage = z.object({
   provider: z.string(),
@@ -70,3 +71,10 @@ export const AreaInsightsResponse = z.object({
   meta: ResponseMeta,
 });
 export type AreaInsightsResponse = z.infer<typeof AreaInsightsResponse>;
+
+/** 인구통계 응답 봉투. 공급자가 지역을 못 커버하면 profile은 null */
+export const DemographicsResponse = z.object({
+  profile: DemographicProfile.nullable(),
+  meta: ResponseMeta,
+});
+export type DemographicsResponse = z.infer<typeof DemographicsResponse>;

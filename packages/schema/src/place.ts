@@ -83,6 +83,11 @@ export const Business = z.object({
   reviews: z.array(Review).optional(),
   /** 사진 URL (역할 소싱: Foursquare 등 공개 CDN URL) */
   photos: z.array(z.url()).optional(),
+  /**
+   * 인기도 0~1 (역할 소싱: Foursquare popularity). 유동인구의 **프록시**이지 실측이 아니다 —
+   * 진짜 방문량은 별도 유료 데이터(SafeGraph/Placer 등)가 필요하다.
+   */
+  popularity: z.number().min(0).max(1).optional(),
 });
 export type Business = z.infer<typeof Business>;
 

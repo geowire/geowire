@@ -9,6 +9,7 @@ import { createNaverProvider } from "@geowirehq/provider-naver";
 import { createBaiduProvider } from "@geowirehq/provider-baidu";
 import { createFoursquareProvider } from "@geowirehq/provider-foursquare";
 import { createOsrmProvider } from "@geowirehq/provider-osrm";
+import { createCensusProvider } from "@geowirehq/provider-census";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createGeoWireMcpServer } from "./server.js";
 
@@ -46,6 +47,9 @@ async function main(): Promise<void> {
 
   const fsqKey = process.env.FOURSQUARE_API_KEY;
   if (fsqKey) providers.push(createFoursquareProvider({ apiKey: fsqKey }));
+
+  const censusKey = process.env.CENSUS_API_KEY;
+  if (censusKey) providers.push(createCensusProvider({ apiKey: censusKey }));
 
   const config = loadConfig(process.env.GEOWIRE_CONFIG);
   const geo = createGeoWire({ providers, config, logger: stderrLogger });

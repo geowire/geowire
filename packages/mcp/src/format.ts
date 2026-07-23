@@ -1,5 +1,24 @@
-import type { Place, ResponseMeta, Route, DistanceMatrix, AreaInsights } from "@geowirehq/schema";
+import type {
+  Place,
+  ResponseMeta,
+  Route,
+  DistanceMatrix,
+  AreaInsights,
+  DemographicProfile,
+} from "@geowirehq/schema";
 import type { ProviderInfo } from "@geowirehq/core";
+
+/** 인구통계 프로파일을 한두 줄 요약으로 */
+function summarizeDemographics(d: DemographicProfile): string {
+  const bits: string[] = [];
+  if (d.population != null) bits.push(`pop ${d.population.toLocaleString()}`);
+  if (d.populationDensityPerSqKm != null) bits.push(`${d.populationDensityPerSqKm}/km²`);
+  if (d.medianAgeYears != null) bits.push(`median age ${d.medianAgeYears}`);
+  if (d.medianHouseholdIncome) bits.push(`median income ${d.medianHouseholdIncome.amount.toLocaleString()} ${d.medianHouseholdIncome.currency}`);
+  if (d.households != null) bits.push(`${d.households.toLocaleString()} households`);
+  if (d.avgHouseholdSize != null) bits.push(`avg ${d.avgHouseholdSize}/household`);
+  return `${d.areaName} (${d.areaLevel}): ${bits.join(", ")}`;
+}
 
 /** 초 → 사람이 읽는 시간 (예: "1h 12m", "8m", "45s") */
 function humanDuration(seconds: number): string {
@@ -118,8 +137,18 @@ export function formatAreaInsights(insights: AreaInsights, meta: ResponseMeta): 
     return `- ${c.category}: ${c.count} found (${c.densityPerSqKm}/km²)${rating}${price}${top ? `\n    top: ${top}` : ""}`;
   });
   const overall = insights.rating ? `\nOverall rating: ★${insights.rating.average} avg over ${insights.rating.count} rated places` : "";
+  const demo = insights.demographics ? `\nDemographics: ${summarizeDemographics(insights.demographics)}` : "";
   const attribution = meta.attributions.length ? `\nAttribution: ${meta.attributions.join("; ")}` : "";
-  return `${head}\n${rows.join("\n")}${overall}\n\n${formatMeta(meta)}${attribution}`.trim();
+  return `${head}\n${rows.join("\n")}${overall}${demo}\n\n${formatMeta(meta)}${attribution}`.trim();
+}
+
+/** get_demographics 텍스트 */
+export function formatDemographics(profile: DemographicProfile | null, meta: ResponseMeta): string {
+  if (!profile) {
+    return `No demographics available for this location (needs a demographics provider covering the area — e.g. US Census with a free key, US only).\n\n${formatMeta(meta)}`;
+  }
+  const attribution = profile.attributions.length ? `\nAttribution: ${profile.attributions.join("; ")}` : "";
+  return `${summarizeDemographics(profile)}${attribution}`;
 }
 
 /** list_geo_providers 텍스트 */

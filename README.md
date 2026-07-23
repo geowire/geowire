@@ -122,7 +122,8 @@ Full embedded-SDK guide: [`examples/typescript-sdk.md`](./examples/typescript-sd
 | `reverse_geocode` | Coordinates → nearest address |
 | `get_directions` | Route between waypoints (distance, time, legs) — no key (OSRM) |
 | `distance_matrix` | N×M travel distances/times — rank candidates by drive time — no key |
-| `analyze_area` | Commercial-area analysis: category density, competition, rating landscape |
+| `analyze_area` | Commercial-area analysis: category density, competition, rating landscape, demographics |
+| `get_demographics` | Population / age / income for a coordinate's area (US Census, free key) |
 | `list_geo_providers` | Active providers, capabilities, status (agent self-awareness) |
 
 Every response includes both a human-readable summary and `structuredContent`
@@ -138,7 +139,8 @@ Every response includes both a human-readable summary and `structuredContent`
 | GET | `/v1/reverse-geocode?lat=&lon=` | reverse geocode |
 | POST | `/v1/directions` | directions between waypoints (no key) |
 | POST | `/v1/distance-matrix` | N×M travel distance/time matrix (no key) |
-| POST | `/v1/analyze-area` | commercial-area analysis (density, competition, ratings) |
+| POST | `/v1/analyze-area` | commercial-area analysis (density, competition, ratings, demographics) |
+| GET | `/v1/demographics?lat=&lon=` | area demographics (US Census, free key) |
 | GET | `/v1/providers` | list providers |
 | GET | `/v1/health` | health check |
 | GET | `/metrics` | Prometheus metrics |
@@ -215,6 +217,7 @@ Keys come from the environment (`${VAR}`), never committed in plaintext.
 | `@geowirehq/provider-naver` (네이버 지역검색, KR) | BYOK `NAVER_CLIENT_ID`+`NAVER_CLIENT_SECRET` | search, geocode |
 | `@geowirehq/provider-baidu` (百度地图, CN) | BYOK `BAIDU_MAP_AK` | search, geocode, reverseGeocode |
 | `@geowirehq/provider-foursquare` (global POI) | BYOK `FOURSQUARE_API_KEY` | search, getPlace |
+| `@geowirehq/provider-census` (US demographics) | BYOK `CENSUS_API_KEY` (free) | demographics |
 | `@geowirehq/provider-internal` (your CSV) | none | search |
 
 Regional providers make Korea (Kakao/Naver) and China (Baidu) coverage
@@ -268,9 +271,9 @@ v0.1 is deliberately "It works" scope. Honest about what's **not** in it yet:
 | Field sourcing | **role-based merge** (each provider's authoritative fields) | per-field config overrides |
 | Routing providers | **OSRM** (no key), **Google Routes** (BYOK) | Mapbox, Valhalla, HERE |
 | Routing | explicit `country`, free-first cost ordering | country **inference** from coordinates |
-| Analysis | **category density / competition / rating landscape** | demographics, foot-traffic, isochrones |
+| Analysis | category density / competition / rating landscape, **US demographics**, **activity proxy** | real foot-traffic (paid data), isochrones, Korea demographics (SGIS) |
 | Cache | in-memory (LRU) | **Redis** adapter |
-| Providers | OSM, OSRM, Google, Kakao, Naver, Baidu, Foursquare, your CSV | Mapbox, HERE, TomTom, … (community PRs welcome) |
+| Providers | OSM, OSRM, Google, Kakao, Naver, Baidu, Foursquare, **Census**, your CSV | Mapbox, HERE, TomTom, … (community PRs welcome) |
 | Rate limiting | per-provider (OSM 1 req/s) | global / per-endpoint |
 
 ## Architecture

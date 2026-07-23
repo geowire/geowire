@@ -102,6 +102,41 @@ describe("analyzeArea (지역/상권 분석)", () => {
     expect(res.insights.totalPlaces).toBe(2);
   });
 
+  it("활동 프록시(popularity 평균·리뷰 합계)를 집계하고 실측 아님을 라벨링한다", async () => {
+    const withActivity = (id: string, name: string, pop: number, reviews: number): ProviderPlace => {
+      const pp = p(id, name);
+      pp.business = { popularity: pop, reviewCount: reviews };
+      return pp;
+    };
+    const geo = createGeoWire({
+      providers: [
+        catProvider({
+          cafe: [withActivity("c1", "Blue Bottle", 0.9, 100), withActivity("c2", "Onion", 0.7, 50)],
+        }),
+      ],
+    });
+    const res = await geo.analyzeArea({ center: CENTER, radiusMeters: 1000, categories: ["cafe"] });
+    const act = res.insights.categories[0]!.activity!;
+    expect(act.avgPopularity).toBeCloseTo(0.8, 5);
+    expect(act.totalReviews).toBe(150);
+    expect(act.note).toContain("not measured foot-traffic");
+  });
+
+  it("demographics 공급자가 중심점을 커버하면 인구통계를 포함한다", async () => {
+    const censusish: GeoProvider = defineProvider({
+      manifest: manifest({ id: "census", capabilities: ["demographics"], authType: "apiKey", coverage: ["US"] }),
+      async demographics() {
+        return { areaName: "Tract 1", areaLevel: "tract", population: 5000, source: "census" };
+      },
+    });
+    const geo = createGeoWire({
+      providers: [catProvider({ cafe: [p("c1", "Blue Bottle", 4.5)] }), censusish],
+    });
+    const res = await geo.analyzeArea({ center: CENTER, radiusMeters: 1000, categories: ["cafe"] });
+    expect(res.insights.demographics?.population).toBe(5000);
+    expect(res.insights.demographics?.attributions).toBeDefined();
+  });
+
   it("응답 meta에 사용 공급자를 합산해 노출한다", async () => {
     const geo = createGeoWire({
       providers: [catProvider({ cafe: [p("c1", "Cafe A", 4.5)] })],

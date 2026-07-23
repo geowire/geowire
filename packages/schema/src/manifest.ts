@@ -10,6 +10,7 @@ export const Capability = z.enum([
   "getPlace",
   "route",
   "distanceMatrix",
+  "demographics",
 ]);
 export type Capability = z.infer<typeof Capability>;
 

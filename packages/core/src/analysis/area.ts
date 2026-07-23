@@ -9,9 +9,13 @@ import type {
   ProviderSkip,
 } from "@geowirehq/schema";
 import { runOperation } from "../pipeline/pipeline.js";
+import { runDemographics } from "../pipeline/routing.js";
 import { resolveCountry } from "../pipeline/normalize-request.js";
 import type { OperationSpec } from "../pipeline/types.js";
 import type { PipelineHost } from "../pipeline/pipeline.js";
+
+const ACTIVITY_NOTE =
+  "proxy from Foursquare popularity + review counts — not measured foot-traffic";
 
 /** 수치 배열 → 요약 통계(개수·평균·최소·최대). 표본 없으면 undefined */
 function summarize(values: number[]): StatSummary | undefined {
@@ -127,6 +131,22 @@ export async function runAreaInsights(
     if (r) insight.rating = r;
     const pr = summarize(prices);
     if (pr) insight.priceLevel = pr;
+
+    // 활동/유동인구 프록시: popularity 평균 + 리뷰 수 합계 (실측 아님)
+    const pops = results
+      .map((p) => p.business?.popularity)
+      .filter((v): v is number => typeof v === "number");
+    const totalReviews = results.reduce((s, p) => s + (p.business?.reviewCount ?? 0), 0);
+    if (pops.length > 0 || totalReviews > 0) {
+      const activity: NonNullable<CategoryInsight["activity"]> = {
+        totalReviews,
+        note: ACTIVITY_NOTE,
+      };
+      if (pops.length > 0) {
+        activity.avgPopularity = Math.round((pops.reduce((a, b) => a + b, 0) / pops.length) * 100) / 100;
+      }
+      insight.activity = activity;
+    }
     categories.push(insight);
   }
 
@@ -145,6 +165,18 @@ export async function runAreaInsights(
   };
   const overall = summarize(overallRatings);
   if (overall) insights.rating = overall;
+
+  // 중심점 인구통계(있으면). demographics 공급자가 없거나 지역 미커버면 조용히 생략.
+  try {
+    const { profile, meta } = await runDemographics(host, {
+      location: req.center,
+      options: req.options,
+    });
+    metas.push(meta);
+    if (profile) insights.demographics = profile;
+  } catch {
+    // 인구통계는 부가 정보 — 실패해도 상권 분석은 그대로 낸다
+  }
 
   return { insights, meta: combineMeta(metas) };
 }

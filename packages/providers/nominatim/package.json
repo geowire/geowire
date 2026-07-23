@@ -1,6 +1,6 @@
 {
   "name": "@geowirehq/provider-nominatim",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "GeoWire Nominatim (OpenStreetMap) provider — zero-config default, no API key",
   "license": "Apache-2.0",
   "type": "module",

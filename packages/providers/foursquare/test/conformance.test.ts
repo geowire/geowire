@@ -20,6 +20,7 @@ const detail = {
   website: "https://bluebottlecoffee.com",
   rating: 9.0, // 0~10 스케일 → 4.5로 정규화
   price: 2,
+  popularity: 0.87,
   photos: [
     { prefix: "https://fastly.4sqi.net/img/general/", suffix: "/12345_abc.jpg", width: 1920, height: 1440 },
     { prefix: "https://fastly.4sqi.net/img/general/", suffix: "/67890_def.jpg" },
@@ -105,6 +106,8 @@ describe("createFoursquareProvider — BYOK", () => {
     const p = await provider.getPlace!({ id: "fsq_abc123" }, ctx);
     expect(p?.business?.rating).toBe(4.5); // 9.0/2
     expect(p?.business?.priceLevel).toBe(2);
+    expect(p?.business?.popularity).toBe(0.87); // 유동인구 프록시
+
     // prefix+original+suffix로 조립된 공개 CDN URL(키 불필요)
     expect(p?.business?.photos).toEqual([
       "https://fastly.4sqi.net/img/general/original/12345_abc.jpg",

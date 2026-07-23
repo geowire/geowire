@@ -29,7 +29,13 @@ export {
   RouteResponse,
   DistanceMatrixResponse,
   AreaInsightsResponse,
+  DemographicsResponse,
 } from "./response.js";
+export {
+  MoneyAmount,
+  DemographicProfile,
+  DemographicsRequest,
+} from "./demographics.js";
 export {
   AreaInsightsRequest,
   StatSummary,

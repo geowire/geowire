@@ -8,6 +8,7 @@ import type {
   AutocompleteRequest,
   RouteRequest,
   DistanceMatrixRequest,
+  DemographicsRequest,
 } from "@geowirehq/schema";
 import type { ProviderContext } from "./context.js";
 import type {
@@ -15,6 +16,7 @@ import type {
   ProviderPlace,
   ProviderRoute,
   ProviderDistanceMatrix,
+  ProviderDemographics,
 } from "./types.js";
 
 /**
@@ -48,6 +50,11 @@ export interface GeoProvider {
     req: DistanceMatrixRequest,
     ctx: ProviderContext,
   ): Promise<ProviderDistanceMatrix>;
+  /** 지점이 속한 지역의 인구통계. 커버 안 하면 null */
+  demographics?(
+    req: DemographicsRequest,
+    ctx: ProviderContext,
+  ): Promise<ProviderDemographics | null>;
 
   /** 선택적 상태 점검. 없으면 registry가 가벼운 기본 점검을 쓴다 */
   healthCheck?(ctx: ProviderContext): Promise<ProviderHealth>;
@@ -62,4 +69,5 @@ export const CAPABILITY_METHOD: Record<Capability, keyof GeoProvider> = {
   autocomplete: "autocomplete",
   route: "route",
   distanceMatrix: "distanceMatrix",
+  demographics: "demographics",
 };

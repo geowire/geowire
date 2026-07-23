@@ -71,13 +71,14 @@ async function connectClient(geo: GeoWire): Promise<Client> {
 }
 
 describe("GeoWire MCP 서버 — 도구 목록", () => {
-  it("8개 도구를 노출한다", async () => {
+  it("9개 도구를 노출한다", async () => {
     const client = await connectClient(buildGeo());
     const { tools } = await client.listTools();
     expect(tools.map((t) => t.name).sort()).toEqual([
       "analyze_area",
       "distance_matrix",
       "geocode_address",
+      "get_demographics",
       "get_directions",
       "get_place",
       "list_geo_providers",

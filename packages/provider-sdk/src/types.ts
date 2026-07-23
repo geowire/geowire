@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Place, Route, DistanceMatrix } from "@geowirehq/schema";
+import { Place, Route, DistanceMatrix, DemographicProfile } from "@geowirehq/schema";
 
 /**
  * 공급자가 반환하는 정규화된 장소 — `Place`에서 **core의 책임인 필드를 제거**한 형태다.
@@ -35,6 +35,10 @@ export const ProviderDistanceMatrix = DistanceMatrix.omit({
   attributions: true,
 });
 export type ProviderDistanceMatrix = z.infer<typeof ProviderDistanceMatrix>;
+
+/** 공급자가 반환하는 인구통계 — `attributions`는 core가 주입(공급자는 source만 채움) */
+export const ProviderDemographics = DemographicProfile.omit({ attributions: true });
+export type ProviderDemographics = z.infer<typeof ProviderDemographics>;
 
 /** 공급자 상태 점검 결과 (registry의 서킷브레이커·`/v1/providers` 노출용) */
 export interface ProviderHealth {

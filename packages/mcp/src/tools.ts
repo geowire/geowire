@@ -7,6 +7,7 @@ import {
   RouteRequest,
   DistanceMatrixRequest,
   AreaInsightsRequest,
+  DemographicsRequest,
 } from "@geowirehq/schema";
 import type { GeoWire } from "@geowirehq/core";
 import { GeoProviderError } from "@geowirehq/provider-sdk";
@@ -18,6 +19,7 @@ import {
   formatRoutes,
   formatMatrix,
   formatAreaInsights,
+  formatDemographics,
 } from "./format.js";
 
 /**
@@ -121,6 +123,16 @@ export const TOOL_DEFS: Tool[] = [
     inputSchema: toInputSchema(AreaInsightsRequest),
   },
   {
+    name: "get_demographics",
+    description:
+      "Get demographics (population, median age, median household income, households) for the area " +
+      "containing a coordinate. Use this for market context — 'who lives around here', income/age of an " +
+      "area. Requires a demographics provider: US Census (free key, US only). Returns null outside coverage. " +
+      'Example: {"location": {"latitude": 37.7749, "longitude": -122.4194}}. ' +
+      "For a full commercial picture combine with analyze_area, which folds this in automatically.",
+    inputSchema: toInputSchema(DemographicsRequest),
+  },
+  {
     name: "list_geo_providers",
     description:
       "List the geo data providers currently configured, with their capabilities, enabled state, priority, " +
@@ -187,6 +199,10 @@ export async function dispatchTool(
       case "analyze_area": {
         const res = await geo.analyzeArea(args);
         return textResult(formatAreaInsights(res.insights, res.meta), res);
+      }
+      case "get_demographics": {
+        const res = await geo.getDemographics(args);
+        return textResult(formatDemographics(res.profile, res.meta), res);
       }
       case "list_geo_providers": {
         const providers = geo.listProviders();

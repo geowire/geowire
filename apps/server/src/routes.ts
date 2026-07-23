@@ -11,6 +11,7 @@ import {
   DistanceMatrixResponse,
   AreaInsightsRequest,
   AreaInsightsResponse,
+  DemographicsResponse,
 } from "@geowirehq/schema";
 import type { Metrics } from "./metrics.js";
 
@@ -177,6 +178,24 @@ export function registerRoutes(app: FastifyInstance, geo: GeoWire, metrics: Metr
     },
     async (request) => {
       const result = await geo.analyzeArea(request.body);
+      metrics.recordMeta(result.meta);
+      return result;
+    },
+  );
+
+  app.get(
+    "/v1/demographics",
+    {
+      schema: {
+        tags: ["analysis"],
+        summary: "좌표가 속한 지역의 인구통계 (US Census 등)",
+        querystring: jsonSchema(ReverseQuery),
+        response: { 200: jsonSchema(DemographicsResponse) },
+      },
+    },
+    async (request) => {
+      const q = ReverseQuery.parse(request.query);
+      const result = await geo.getDemographics({ location: { latitude: q.lat, longitude: q.lon } });
       metrics.recordMeta(result.meta);
       return result;
     },

@@ -13,6 +13,8 @@ import {
   DistanceMatrixResponse,
   AreaInsightsRequest,
   AreaInsightsResponse,
+  DemographicsRequest,
+  DemographicsResponse,
   Place,
 } from "@geowirehq/schema";
 import { GeoWireConfig, defaultConfig } from "./config/schema.js";
@@ -21,7 +23,7 @@ import { collectConfigWarnings } from "./config/warnings.js";
 import { ProviderRegistry } from "./registry.js";
 import { runOperation } from "./pipeline/pipeline.js";
 import { runGetPlace } from "./pipeline/get-place.js";
-import { runRoute, runDistanceMatrix } from "./pipeline/routing.js";
+import { runRoute, runDistanceMatrix, runDemographics } from "./pipeline/routing.js";
 import { runAreaInsights } from "./analysis/area.js";
 import { resolveCountry } from "./pipeline/normalize-request.js";
 import type { OperationSpec } from "./pipeline/types.js";
@@ -169,6 +171,16 @@ export class GeoWire {
       throw new Error("사용 가능한 distanceMatrix 공급자가 없습니다 (OSRM 등록 필요)");
     }
     return DistanceMatrixResponse.parse({ matrix, meta });
+  }
+
+  /**
+   * 지점이 속한 지역의 인구통계 (설계: demographics/v1). demographics capable 공급자에서
+   * first-success로 얻는다(예: US Census). 커버 못 하면 profile은 null.
+   */
+  async getDemographics(input: unknown): Promise<DemographicsResponse> {
+    const req = DemographicsRequest.parse(input);
+    const { profile, meta } = await runDemographics(this, req);
+    return DemographicsResponse.parse({ profile, meta });
   }
 
   /**

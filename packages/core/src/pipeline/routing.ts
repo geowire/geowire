@@ -2,8 +2,10 @@ import { GeoProviderError } from "@geowirehq/provider-sdk";
 import type {
   RouteRequest,
   DistanceMatrixRequest,
+  DemographicsRequest,
   Route,
   DistanceMatrix,
+  DemographicProfile,
   ResponseMeta,
   ProviderUsage,
   ProviderSkip,
@@ -32,7 +34,7 @@ interface Dispatch {
  */
 async function firstSuccess<T>(
   host: PipelineHost,
-  capability: "route" | "distanceMatrix",
+  capability: "route" | "distanceMatrix" | "demographics",
   timeoutMs: number,
   providers: string[] | undefined,
   call: (rp: RegisteredProvider, ctx: ReturnType<typeof makeContext>) => Promise<T | null>,
@@ -140,4 +142,27 @@ export async function runDistanceMatrix(
     },
   );
   return { matrix: result, meta };
+}
+
+/** 인구통계 실행. demographics capable 공급자를 first-success로(지역 커버 못 하면 다음). */
+export async function runDemographics(
+  host: PipelineHost,
+  req: DemographicsRequest,
+): Promise<{ profile: DemographicProfile | null; meta: ResponseMeta }> {
+  const timeoutMs = req.options?.timeoutMs ?? DEFAULT_PROVIDER_TIMEOUT_MS;
+  const { result, meta } = await firstSuccess<DemographicProfile>(
+    host,
+    "demographics",
+    timeoutMs,
+    req.options?.providers,
+    async (rp, ctx) => {
+      const fn = rp.provider.demographics;
+      if (typeof fn !== "function") return null;
+      const p = await fn.call(rp.provider, req, ctx);
+      if (!p) return null;
+      const attr = rp.provider.manifest.policy.attributionRequired;
+      return { ...p, attributions: attr ? [attr] : [] };
+    },
+  );
+  return { profile: result, meta };
 }

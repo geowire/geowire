@@ -28,6 +28,7 @@ export interface FsqPlace {
   rating?: number; // 0~10 스케일 (현행 API)
   price?: number; // 1(저렴)~4(고가)
   photos?: FsqPhoto[];
+  popularity?: number; // 0~1 (유동인구 프록시)
 }
 
 /** Foursquare 사진 객체 → 원본 크기 공개 URL. prefix/suffix 없으면 null. */
@@ -76,6 +77,7 @@ export function parseFsqPlace(raw: FsqPlace): ProviderPlace | null {
   const business: Business = {};
   if (typeof raw.rating === "number") business.rating = Math.max(0, Math.min(5, raw.rating / 2));
   if (typeof raw.price === "number") business.priceLevel = Math.max(0, Math.min(4, Math.round(raw.price)));
+  if (typeof raw.popularity === "number") business.popularity = Math.max(0, Math.min(1, raw.popularity));
   const photos = (raw.photos ?? []).map(fsqPhotoUrl).filter((u): u is string => u !== null);
   if (photos.length > 0) business.photos = photos;
   if (Object.keys(business).length > 0) place.business = business;

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { LatLng, Place } from "./place.js";
 import { RequestOptions } from "./requests.js";
+import { DemographicProfile } from "./demographics.js";
 
 /**
  * 지역/상권 분석 요청 (설계: analysis/v1).
@@ -39,6 +40,20 @@ export const CategoryInsight = z.object({
   rating: StatSummary.optional(),
   /** 가격대 요약 (0~4) */
   priceLevel: StatSummary.optional(),
+  /**
+   * 활동/유동인구 **프록시** — 실측이 아니다. Foursquare popularity 평균과
+   * 총 리뷰 수(engagement)에서 파생. 진짜 방문량은 유료 데이터가 필요하다.
+   */
+  activity: z
+    .object({
+      /** 평균 인기도 0~1 (popularity 있는 장소 기준) */
+      avgPopularity: z.number().min(0).max(1).optional(),
+      /** 리뷰 수 합계 (관심도 신호) */
+      totalReviews: z.number().int().nonnegative(),
+      /** 프록시임을 명시하는 라벨 */
+      note: z.string(),
+    })
+    .optional(),
   /** 대표 상위 장소 (평점 우선, 없으면 거리순) */
   topPlaces: z.array(Place),
 });
@@ -58,5 +73,7 @@ export const AreaInsights = z.object({
   categories: z.array(CategoryInsight),
   /** 전체 평점 요약 */
   rating: StatSummary.optional(),
+  /** 중심점이 속한 지역의 인구통계 (demographics 공급자가 커버할 때만) */
+  demographics: DemographicProfile.optional(),
 });
 export type AreaInsights = z.infer<typeof AreaInsights>;
