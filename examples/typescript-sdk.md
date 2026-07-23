@@ -19,7 +19,7 @@ const geo = createGeoWire({ providers: [createNominatimProvider()] });
 
 const { results, meta } = await geo.searchPlaces({
   query: "Starbucks",
-  near: { latitude: 37.4979, longitude: 127.0276 },
+  near: { latitude: 37.7749, longitude: -122.4194 },
   radiusMeters: 3000,
 });
 
@@ -50,7 +50,7 @@ const geo = createGeoWire({
 
 const { results, meta } = await geo.searchPlaces({
   query: "Blue Bottle",
-  near: { latitude: 37.4979, longitude: 127.0276 },
+  near: { latitude: 37.7749, longitude: -122.4194 },
   radiusMeters: 2000,
 });
 

@@ -70,17 +70,17 @@ results to that radius — anything outside is dropped.
 
 **CLI**
 ```bash
-npx @geowirehq/cli search "Starbucks" --near 37.4979,127.0276 --radius 3000
+npx @geowirehq/cli search "Starbucks" --near 37.7749,-122.4194 --radius 3000
 ```
 
 ```
 Found 3 places · first-success · nominatim · 742ms
 
-#  Name  Distance  Address                                   Sources
-─  ────  ────────  ────────────────────────────────────────  ─────────
-1  스타벅스  1264m     스타벅스, 테헤란로, 역삼1동, 강남구, 서울특별시, …    nominatim
-2  스타벅스  2074m     스타벅스, 봉은사로, 삼성2동, 강남구, 서울특별시, …    nominatim
-3  스타벅스  2183m     스타벅스, 409, 테헤란로, 삼성2동, 강남구, …          nominatim
+#  Name       Distance  Address                                       Sources
+─  ─────────  ────────  ────────────────────────────────────────────  ─────────
+1  Starbucks  410m      201 Powell St, San Francisco, CA 94102, US    nominatim
+2  Starbucks  980m      333 Market St, San Francisco, CA 94105, US    nominatim
+3  Starbucks  1620m     1231 Market St, San Francisco, CA 94103, US   nominatim
 Attribution: © OpenStreetMap contributors
 ```
 
@@ -88,7 +88,7 @@ Attribution: © OpenStreetMap contributors
 ```bash
 curl -X POST http://localhost:4980/v1/places/search \
   -H "content-type: application/json" \
-  -d '{"query":"Starbucks","near":{"latitude":37.4979,"longitude":127.0276},"radiusMeters":3000}'
+  -d '{"query":"Starbucks","near":{"latitude":37.7749,"longitude":-122.4194},"radiusMeters":3000}'
 ```
 
 > Tip: `near` without `radiusMeters` biases (soft); with `radiusMeters` it
@@ -103,15 +103,15 @@ Coordinates → the nearest addressable place.
 
 **CLI**
 ```bash
-npx @geowirehq/cli reverse 37.5665,126.9780
+npx @geowirehq/cli reverse 37.8199,-122.4783
 ```
 
 **REST**
 ```bash
-curl "http://localhost:4980/v1/reverse-geocode?lat=37.5665&lon=126.9780"
+curl "http://localhost:4980/v1/reverse-geocode?lat=37.8199&lon=-122.4783"
 ```
 
-**MCP** — "What's at 37.5665, 126.9780?"
+**MCP** — "What's at 37.8199, -122.4783?"
 
 ---
 
@@ -122,7 +122,7 @@ failed**, per-field sourcing, confidence, cache status, and (for paid
 providers) estimated cost. No black box.
 
 ```bash
-npx @geowirehq/cli search "Gyeongbokgung Palace" --limit 1 --json
+npx @geowirehq/cli search "Golden Gate Bridge" --limit 1 --json
 ```
 
 ```jsonc
@@ -130,18 +130,18 @@ npx @geowirehq/cli search "Gyeongbokgung Palace" --limit 1 --json
   "results": [
     {
       "id": "gwp_CvWvRZrFtegkJPxP9CW0",
-      "name": "경복궁",
-      "categories": ["park"],
-      "location": { "latitude": 37.579754, "longitude": 126.9766818 },
+      "name": "Golden Gate Bridge",
+      "categories": ["bridge"],
+      "location": { "latitude": 37.8199286, "longitude": -122.4782551 },
       "address": {
-        "formatted": "경복궁, 청운효자동, 종로구, 서울특별시, 03045, 대한민국",
-        "country": "KR", "city": "서울특별시", "postalCode": "03045"
+        "formatted": "Golden Gate Bridge, San Francisco, California, United States",
+        "country": "US", "region": "California", "city": "San Francisco"
       },
       "confidence": 0.495,
       "sources": [
         {
           "provider": "nominatim",
-          "providerPlaceId": "relation/5501517",
+          "providerPlaceId": "way/27385590",
           "fetchedAt": "2026-07-18T14:08:29.415Z",
           "confidence": 0.495,
           "fields": ["name", "location", "categories", "address"]  // which fields this source contributed
@@ -187,7 +187,7 @@ dedup:
 **Run**
 ```bash
 GOOGLE_MAPS_API_KEY=... npx @geowirehq/cli search "Blue Bottle" \
-  --near 37.4979,127.0276 --radius 2000 --strategy merge --json
+  --near 37.7749,-122.4194 --radius 2000 --strategy merge --json
 ```
 
 The same café returned by Google and OSM collapses into **one** result whose
@@ -197,8 +197,8 @@ The same café returned by Google and OSM collapses into **one** result whose
 {
   "results": [{
     "name": "Blue Bottle Coffee",
-    "location": { "latitude": 37.4981, "longitude": 127.0272 },
-    "business": { "openingHours": "Mon-Sun 08:00-21:00", "rating": 4.4 }, // from Google
+    "location": { "latitude": 37.7764, "longitude": -122.4230 },
+    "business": { "openingHours": "Mon-Sun 07:00-19:00", "rating": 4.4 }, // from Google
     "sources": [
       { "provider": "google",    "providerPlaceId": "ChIJ...", "fields": ["name","business","contact"] },
       { "provider": "nominatim", "providerPlaceId": "node/...", "fields": ["location","address"] }
@@ -248,27 +248,28 @@ GOOGLE_MAPS_API_KEY=... npx @geowirehq/cli search "Eiffel Tower" --strategy cost
 ```
 
 `weighted` goes further: it orders providers per request by a score over
-priority, cost, and **coverage** — so a `country: KR` request routes to Kakao/
-Naver first, a cost-sensitive one routes to free providers first. Tune the mix
-in `routing.providerWeights`.
+priority, cost, and **coverage** — so a `country: US` request favors providers
+that cover the US (Yelp, Google), a cost-sensitive one routes to free providers
+first, and a `country: KR` request routes to Kakao/Naver. Tune the mix in
+`routing.providerWeights`.
 
 ---
 
 ## 7. Route by country
 
-Prefer different providers per country — e.g. your own data first in Korea,
-Google in the US, OSM everywhere else.
+Prefer different providers per country — e.g. your own data + Yelp in the US,
+Kakao in Korea, OSM everywhere else.
 
 **Config**
 ```yaml
 routing:
   defaultStrategy: first-success
   countries:
-    KR: { providers: ["internal", "nominatim"], strategy: merge }
-    US: { providers: ["google", "nominatim"] }
+    US: { providers: ["internal", "yelp", "google", "nominatim"], strategy: merge }
+    KR: { providers: ["kakao", "nominatim"] }
 ```
 
-Pass `country` on the request (`--country KR`, or `"country":"KR"`), and the
+Pass `country` on the request (`--country US`, or `"country":"US"`), and the
 plan uses that country's provider order and strategy.
 
 ---
@@ -281,12 +282,12 @@ search, fallback, and merge — no code.
 **`my-places.csv`** (see [`examples/customer-csv/`](../examples/customer-csv/))
 ```csv
 id,name,latitude,longitude,category,address,phone
-store-001,Acme Coffee Gangnam,37.4979,127.0276,cafe,"123 Teheran-ro, Seoul",+82-2-1234-5678
+store-001,Acme Coffee Downtown SF,37.7749,-122.4194,cafe,"123 Market St, San Francisco, CA",+1-415-555-0142
 ```
 
 **Run**
 ```bash
-GEOWIRE_INTERNAL_CSV=./my-places.csv npx @geowirehq/cli search "Acme" --near 37.4979,127.0276
+GEOWIRE_INTERNAL_CSV=./my-places.csv npx @geowirehq/cli search "Acme" --near 37.7749,-122.4194
 ```
 
 Your places come back tagged `sources: internal`, and with `strategy: merge`

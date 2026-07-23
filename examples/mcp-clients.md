@@ -97,7 +97,7 @@ After connecting, ask your client:
 
 It should call `list_geo_providers` and report `nominatim` (plus `google` if you
 added a key). Then try:
-> "Find a Starbucks within 3 km of 37.4979, 127.0276."
+> "Find coffee within 2 km of 37.7749, -122.4194 (San Francisco)."
 
 For what works well vs. what needs a Google key, see
 [../docs/recipes.md](../docs/recipes.md).

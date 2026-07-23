@@ -37,7 +37,7 @@ def search_places(**args):
     r.raise_for_status()
     return r.json()
 
-messages = [{"role": "user", "content": "Find a Starbucks within 3km of 37.4979,127.0276"}]
+messages = [{"role": "user", "content": "Find a Starbucks within 3km of 37.7749, -122.4194"}]
 resp = client.chat.completions.create(model="gpt-4o", messages=messages, tools=tools)
 
 call = resp.choices[0].message.tool_calls[0]

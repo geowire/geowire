@@ -50,6 +50,6 @@ const searchPlaces = tool({
 const { text } = await generateText({
   model: openai("gpt-4o"),
   tools: { searchPlaces },
-  prompt: "Find coffee near Gangnam station.",
+  prompt: "Find coffee near downtown San Francisco.",
 });
 ```

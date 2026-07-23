@@ -1,26 +1,29 @@
 # GeoWire
 
-> **Add real-world places to any AI agent in 5 minutes — no API key required.**
+> **Give any AI agent real-world location intelligence in 5 minutes — no API key required.**
 >
-> One place-search interface for every AI and map provider.
+> One interface for place search, directions, and area/market analysis across every map provider.
 
 <p align="center">
   <img src="docs/media/geowire-mcp.gif" alt="geowire MCP server — tools/list and a geocode_address call over stdio" width="760">
 </p>
 
-GeoWire is an open-source geo search gateway that sits between AI agents and
-map/place data providers (OpenStreetMap, Google, your own data) and exposes them
-through a single **MCP server**, **REST API**, and **SDK** — with provider
-fallback, multi-provider merge + dedup, cost budgets, and a policy engine that
-enforces each provider's caching/attribution terms.
+GeoWire is an open-source geo intelligence gateway that sits between AI agents and
+map/place data providers (OpenStreetMap, Google, Yelp, Foursquare, US Census, your
+own data) and exposes them through a single **MCP server**, **REST API**, and
+**SDK**. One interface for **place search, geocoding, directions & distance
+matrices, and commercial-area analysis (density, ratings, demographics)** — with
+provider fallback, multi-provider merge + dedup, cost budgets, and a policy engine
+that enforces each provider's caching/attribution terms.
 
-**Status: v0.1 ("It works") — published on npm. MCP · REST · CLI · SDK all functional.**
+**Published on npm — MCP · REST · CLI · SDK all functional. 10 providers, 8 operations.**
 
 > **Honest by design:** OpenStreetMap (the zero-key default) is a great
 > *geocoder* — strong on place names, addresses, and landmarks — but thin on
-> category words ("coffee", "pharmacy"), opening hours, and coverage outside
-> Europe. Add a Google key for full business data; GeoWire merges both and tells
-> you which source every field came from.
+> category words ("coffee", "pharmacy"), ratings, and hours. For US/Western
+> commercial data, add a Google, Yelp, or Foursquare key (BYOK) — GeoWire merges
+> them and tells you which source every field came from. Directions run key-free
+> on OpenStreetMap routing (OSRM); US demographics come from the Census (free key).
 
 **Contents:** [Why](#why-geowire) · [Quickstart](#quickstart) · [MCP tools](#mcp-tools) · [REST](#rest-endpoints) · [Anatomy of a response](#anatomy-of-a-response) · [Config](#configuration-optional--everything-works-without-it) · [Providers](#providers) · [Recipes & examples](#recipes--examples) · [Roadmap](#roadmap) · [Architecture](#architecture)
 
@@ -46,6 +49,24 @@ coordinates). Real run below:
   <img src="docs/media/geowire-merge.gif" alt="GeoWire merging a private store DB, Google, and OpenStreetMap into one record with per-field provenance" width="760">
 </p>
 
+### More than search — location intelligence for agents
+
+Once your agent can find places, it can reason about *areas*. One `analyze_area`
+call turns a point + radius into a commercial-district read — category density,
+competition, the rating landscape, and (in the US) demographics:
+
+```jsonc
+// "Is this a good block for a new café?" — SF, 1 km radius
+{ "center": { "latitude": 37.7749, "longitude": -122.4194 }, "radiusMeters": 1000,
+  "categories": ["cafe", "restaurant", "bar"] }
+// → per-category counts + density/km², avg rating (Google/Yelp), price mix,
+//   an activity proxy (Yelp review volume), and Census demographics for the tract.
+```
+
+Same gateway also does **directions & distance matrices** (key-free via OSRM, or
+Google Routes with a key) — so an agent can rank candidates by drive time, not just
+distance. See [Recipes](./docs/recipes.md).
+
 ## Quickstart
 
 ### 1. MCP (Claude Desktop / Cursor) — 30 seconds
@@ -60,10 +81,12 @@ Add this to your MCP client config (e.g. Claude Desktop `claude_desktop_config.j
 }
 ```
 
-Then ask: *"Where is the Eiffel Tower?"* or *"Find a Starbucks within 3 km of
-37.4979, 127.0276."* Works with **zero API keys** — OpenStreetMap is the default.
-Add `"env": { "GOOGLE_MAPS_API_KEY": "..." }` for business listings and hours
-(e.g. *"Find a 24-hour pharmacy near me"*). See [more MCP client configs](./examples/mcp-clients.md).
+Then ask: *"Where is the Golden Gate Bridge?"*, *"Find coffee within 2 km of
+37.7749, -122.4194 (San Francisco)."*, or *"How do I drive from downtown SF to
+Fisherman's Wharf?"* Works with **zero API keys** — OpenStreetMap + OSRM routing
+are the defaults. Add `"env": { "GOOGLE_MAPS_API_KEY": "..." }` (or `YELP_API_KEY`)
+for ratings, reviews, and hours, and `"CENSUS_API_KEY"` for area demographics.
+See [more MCP client configs](./examples/mcp-clients.md).
 
 ### 2. CLI — one-shot search & server
 
@@ -72,10 +95,10 @@ Add `"env": { "GOOGLE_MAPS_API_KEY": "..." }` for business listings and hours
 </p>
 
 ```bash
-npx @geowirehq/cli search "Eiffel Tower"          # terminal search with a results table
-npx @geowirehq/cli search "Starbucks" --near 37.4979,127.0276 --radius 3000   # near a coordinate
-npx @geowirehq/cli reverse 37.5665,126.9780       # coordinate → nearest place
-npx @geowirehq/cli route 37.5665,126.9780 37.4979,127.0276   # driving directions (no key, OSRM)
+npx @geowirehq/cli search "Golden Gate Bridge"    # terminal search with a results table
+npx @geowirehq/cli search "coffee" --near 37.7749,-122.4194 --radius 2000   # near a coordinate
+npx @geowirehq/cli reverse 37.8199,-122.4783      # coordinate → nearest place
+npx @geowirehq/cli route 37.7749,-122.4194 37.8083,-122.4156   # driving directions (no key, OSRM)
 npx @geowirehq/cli get google:ChIJ...             # one place by reference (getPlace-capable provider)
 npx @geowirehq/cli                                # start the REST + MCP server (zero-config)
 npx @geowirehq/cli init                           # interactive setup wizard (.env + config)
@@ -91,7 +114,7 @@ docker run -p 4980:4980 geowire/geowire
 # then:
 curl -X POST http://localhost:4980/v1/places/search \
   -H 'content-type: application/json' \
-  -d '{"query":"Starbucks","near":{"latitude":37.4979,"longitude":127.0276},"radiusMeters":3000}'
+  -d '{"query":"coffee","near":{"latitude":37.7749,"longitude":-122.4194},"radiusMeters":2000}'
 ```
 
 Or with `docker compose up` (see `docker-compose.yml`). API docs at `/docs`.
@@ -104,9 +127,9 @@ import { createNominatimProvider } from "@geowirehq/provider-nominatim";
 
 const geo = createGeoWire({ providers: [createNominatimProvider()] });
 const { results, meta } = await geo.searchPlaces({
-  query: "Starbucks",
-  near: { latitude: 37.4979, longitude: 127.0276 },
-  radiusMeters: 3000,
+  query: "coffee",
+  near: { latitude: 37.7749, longitude: -122.4194 },
+  radiusMeters: 2000,
 });
 ```
 
@@ -159,11 +182,11 @@ cost, and per-field sourcing — so you always know where each value came from.
 {
   "results": [{
     "id": "gwp_CvWvRZrFtegkJPxP9CW0",
-    "name": "경복궁",
-    "location": { "latitude": 37.579754, "longitude": 126.9766818 },
+    "name": "Golden Gate Bridge",
+    "location": { "latitude": 37.8199286, "longitude": -122.4782551 },
     "sources": [{
       "provider": "nominatim",
-      "providerPlaceId": "relation/5501517",
+      "providerPlaceId": "way/27385590",
       "fields": ["name", "location", "categories", "address"]   // ← what this source contributed
     }],
     "attributions": ["© OpenStreetMap contributors"]
@@ -189,10 +212,12 @@ the coordinates came from OSM. Walkthrough: [docs/recipes.md](./docs/recipes.md#
 
 ```yaml
 providers:
-  nominatim: { enabled: true }                       # default ON, no key
+  nominatim: { enabled: true }                       # default ON, no key (search/geocode)
+  osrm:      { enabled: true }                        # default ON, no key (directions)
   google:    { enabled: true, apiKey: ${GOOGLE_MAPS_API_KEY} }
+  yelp:      { enabled: true }                        # env YELP_API_KEY (US/Western business & reviews)
+  census:    { enabled: true }                        # env CENSUS_API_KEY (US demographics, free)
   kakao:     { enabled: true }                        # env KAKAO_REST_API_KEY (KR)
-  naver:     { enabled: true }                        # env NAVER_CLIENT_ID + NAVER_CLIENT_SECRET (KR)
   internal:  { enabled: true, source: ./my-places.csv, priority: 100 }
 routing:
   defaultStrategy: merge          # first-success | merge | cost-aware | weighted | fastest
@@ -286,7 +311,7 @@ AI agent / app
 GeoWire core  ── pipeline: plan → execute → normalize → dedup → rank → policy → cache
    │  GeoProvider contract
    ▼
-providers: nominatim · osrm · google · kakao · naver · baidu · foursquare · internal · (community)
+providers: nominatim · osrm · google · yelp · foursquare · census · kakao · naver · baidu · internal · (community)
 ```
 
 Monorepo packages: `schema` · `provider-sdk` · `provider-testkit` · `core` ·
