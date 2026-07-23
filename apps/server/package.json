@@ -1,6 +1,6 @@
 {
   "name": "@geowirehq/server",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "GeoWire REST API server (Fastify) — /v1 endpoints, OpenAPI, metrics, MCP over HTTP",
   "license": "Apache-2.0",
   "type": "module",
@@ -37,6 +37,7 @@
     "@geowirehq/provider-nominatim": "workspace:*",
     "@geowirehq/provider-osrm": "workspace:*",
     "@geowirehq/provider-sdk": "workspace:*",
+    "@geowirehq/provider-yelp": "workspace:*",
     "@geowirehq/schema": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "fastify": "^5.10.0",

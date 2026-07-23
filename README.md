@@ -217,6 +217,7 @@ Keys come from the environment (`${VAR}`), never committed in plaintext.
 | `@geowirehq/provider-naver` (네이버 지역검색, KR) | BYOK `NAVER_CLIENT_ID`+`NAVER_CLIENT_SECRET` | search, geocode |
 | `@geowirehq/provider-baidu` (百度地图, CN) | BYOK `BAIDU_MAP_AK` | search, geocode, reverseGeocode |
 | `@geowirehq/provider-foursquare` (global POI) | BYOK `FOURSQUARE_API_KEY` | search, getPlace |
+| `@geowirehq/provider-yelp` (US/Western business, ratings & reviews) | BYOK `YELP_API_KEY` | search, getPlace |
 | `@geowirehq/provider-census` (US demographics) | BYOK `CENSUS_API_KEY` (free) | demographics |
 | `@geowirehq/provider-internal` (your CSV) | none | search |
 
@@ -273,7 +274,7 @@ v0.1 is deliberately "It works" scope. Honest about what's **not** in it yet:
 | Routing | explicit `country`, free-first cost ordering | country **inference** from coordinates |
 | Analysis | category density / competition / rating landscape, **US demographics**, **activity proxy** | real foot-traffic (paid data), isochrones, Korea demographics (SGIS) |
 | Cache | in-memory (LRU) | **Redis** adapter |
-| Providers | OSM, OSRM, Google, Kakao, Naver, Baidu, Foursquare, **Census**, your CSV | Mapbox, HERE, TomTom, … (community PRs welcome) |
+| Providers | OSM, OSRM, Google, **Yelp**, Foursquare, Census, Kakao, Naver, Baidu, your CSV | Mapbox, HERE, TomTom, … (community PRs welcome) |
 | Rate limiting | per-provider (OSM 1 req/s) | global / per-endpoint |
 
 ## Architecture

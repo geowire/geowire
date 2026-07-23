@@ -9,6 +9,7 @@ import { createBaiduProvider } from "@geowirehq/provider-baidu";
 import { createFoursquareProvider } from "@geowirehq/provider-foursquare";
 import { createOsrmProvider } from "@geowirehq/provider-osrm";
 import { createCensusProvider } from "@geowirehq/provider-census";
+import { createYelpProvider } from "@geowirehq/provider-yelp";
 
 /**
  * 환경 변수로 GeoWire 인스턴스를 구성한다 (설계 §8.1 Zero-config + BYOK).
@@ -19,6 +20,7 @@ import { createCensusProvider } from "@geowirehq/provider-census";
  * - naver: `NAVER_CLIENT_ID` + `NAVER_CLIENT_SECRET` 있으면 추가 (한국)
  * - baidu: `BAIDU_MAP_AK` 있으면 추가 (중국)
  * - foursquare: `FOURSQUARE_API_KEY` 있으면 추가 (글로벌 POI)
+ * - yelp: `YELP_API_KEY` 있으면 추가 (미국·서구권 비즈니스·리뷰·평점)
  * - census: `CENSUS_API_KEY`(무료) 있으면 추가 (미국 인구통계)
  * - internal: `GEOWIRE_INTERNAL_CSV`(파일 경로) 있으면 추가
  * - config: `GEOWIRE_CONFIG`(YAML 경로) 있으면 로드, 없으면 zero-config 기본값
@@ -46,6 +48,9 @@ export function createGeoFromEnv(logger?: Logger): GeoWire {
 
   const fsqKey = process.env.FOURSQUARE_API_KEY;
   if (fsqKey) providers.push(createFoursquareProvider({ apiKey: fsqKey }));
+
+  const yelpKey = process.env.YELP_API_KEY;
+  if (yelpKey) providers.push(createYelpProvider({ apiKey: yelpKey }));
 
   const censusKey = process.env.CENSUS_API_KEY;
   if (censusKey) providers.push(createCensusProvider({ apiKey: censusKey }));

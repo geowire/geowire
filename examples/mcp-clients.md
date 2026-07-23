@@ -14,6 +14,7 @@ Works with **zero API keys** (OpenStreetMap). Enable more providers by adding an
 - Naver (KR): `"NAVER_CLIENT_ID": "...", "NAVER_CLIENT_SECRET": "..."`
 - Baidu (CN): `"BAIDU_MAP_AK": "..."`
 - Foursquare (global POI): `"FOURSQUARE_API_KEY": "..."`
+- Yelp (US/Western business, ratings & reviews): `"YELP_API_KEY": "..."`
 - US Census demographics (free key): `"CENSUS_API_KEY": "..."`
 - Your own places: `"GEOWIRE_INTERNAL_CSV": "/path/to/places.csv"`
 

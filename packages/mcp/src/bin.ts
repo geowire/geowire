@@ -10,6 +10,7 @@ import { createBaiduProvider } from "@geowirehq/provider-baidu";
 import { createFoursquareProvider } from "@geowirehq/provider-foursquare";
 import { createOsrmProvider } from "@geowirehq/provider-osrm";
 import { createCensusProvider } from "@geowirehq/provider-census";
+import { createYelpProvider } from "@geowirehq/provider-yelp";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createGeoWireMcpServer } from "./server.js";
 
@@ -47,6 +48,9 @@ async function main(): Promise<void> {
 
   const fsqKey = process.env.FOURSQUARE_API_KEY;
   if (fsqKey) providers.push(createFoursquareProvider({ apiKey: fsqKey }));
+
+  const yelpKey = process.env.YELP_API_KEY;
+  if (yelpKey) providers.push(createYelpProvider({ apiKey: yelpKey }));
 
   const censusKey = process.env.CENSUS_API_KEY;
   if (censusKey) providers.push(createCensusProvider({ apiKey: censusKey }));
